@@ -23,23 +23,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import org.apache.commons.lang3.AbstractLangTest;
 import org.junit.jupiter.api.Test;
 
-public class TypeLiteralTest {
+public class TypeLiteralTest extends AbstractLangTest {
 
     @Test
     public void testBasic() {
         assertTrue(TypeUtils.equals(String.class, new TypeLiteral<String>() {}.value));
         assertTrue(TypeUtils.equals(TypeUtils.parameterize(List.class, String.class),
             new TypeLiteral<List<String>>() {}.value));
-    }
-
-    @Test
-    public void testTyped() {
-        final Typed<String> stringType = new TypeLiteral<String>() {};
-        assertTrue(TypeUtils.equals(String.class, stringType.getType()));
-        final Typed<List<String>> listOfStringType = new TypeLiteral<List<String>>() {};
-        assertTrue(TypeUtils.equals(TypeUtils.parameterize(List.class, String.class), listOfStringType.getType()));
     }
 
     @Test
@@ -53,5 +46,13 @@ public class TypeLiteralTest {
     @Test
     public void testRaw() {
         assertThrows(NullPointerException.class, () -> new TypeLiteral() {});
+    }
+
+    @Test
+    public void testTyped() {
+        final Typed<String> stringType = new TypeLiteral<String>() {};
+        assertTrue(TypeUtils.equals(String.class, stringType.getType()));
+        final Typed<List<String>> listOfStringType = new TypeLiteral<List<String>>() {};
+        assertTrue(TypeUtils.equals(TypeUtils.parameterize(List.class, String.class), listOfStringType.getType()));
     }
 }

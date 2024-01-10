@@ -36,13 +36,14 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.AbstractLangTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests "failable" interfaces defined in this package.
  */
-public class FailableFunctionsTest {
+public class FailableFunctionsTest extends AbstractLangTest {
 
     public static class CloseableObject {
         private boolean closed;
@@ -223,44 +224,55 @@ public class FailableFunctionsTest {
             return 0;
         }
 
+        public short testAsShortPrimitive() throws Throwable {
+            return testAsShortPrimitive(throwable);
+        }
+
+        public short testAsShortPrimitive(final Throwable throwable) throws Throwable {
+            if (throwable != null) {
+                throw throwable;
+            }
+            return 0;
+        }
+
         public void testDouble(final double i) throws Throwable {
             test(throwable);
-            acceptedPrimitiveObject1 = (P) ((Double) i);
+            acceptedPrimitiveObject1 = (P) (Double) i;
         }
 
         public double testDoubleDouble(final double i, final double j) throws Throwable {
             test(throwable);
-            acceptedPrimitiveObject1 = (P) ((Double) i);
-            acceptedPrimitiveObject2 = (P) ((Double) j);
+            acceptedPrimitiveObject1 = (P) (Double) i;
+            acceptedPrimitiveObject2 = (P) (Double) j;
             return 3d;
         }
 
         public void testInt(final int i) throws Throwable {
             test(throwable);
-            acceptedPrimitiveObject1 = (P) ((Integer) i);
+            acceptedPrimitiveObject1 = (P) (Integer) i;
         }
 
         public void testLong(final long i) throws Throwable {
             test(throwable);
-            acceptedPrimitiveObject1 = (P) ((Long) i);
+            acceptedPrimitiveObject1 = (P) (Long) i;
         }
 
         public void testObjDouble(final T object, final double i) throws Throwable {
             test(throwable);
             acceptedObject = object;
-            acceptedPrimitiveObject1 = (P) ((Double) i);
+            acceptedPrimitiveObject1 = (P) (Double) i;
         }
 
         public void testObjInt(final T object, final int i) throws Throwable {
             test(throwable);
             acceptedObject = object;
-            acceptedPrimitiveObject1 = (P) ((Integer) i);
+            acceptedPrimitiveObject1 = (P) (Integer) i;
         }
 
         public void testObjLong(final T object, final long i) throws Throwable {
             test(throwable);
             acceptedObject = object;
-            acceptedPrimitiveObject1 = (P) ((Long) i);
+            acceptedPrimitiveObject1 = (P) (Long) i;
         }
     }
 
@@ -883,6 +895,110 @@ public class FailableFunctionsTest {
     }
 
     @Test
+    public void testFailableBiFunctionNop() throws Throwable {
+        assertNull(FailableBiFunction.nop().apply("Foo", "Bar"), "Expect NOP to return null");
+    }
+
+    @Test
+    public void testFailableConsumerNop() throws Throwable {
+        // Expect nothing thrown
+        FailableConsumer.nop().accept("Foo");
+    }
+
+    @Test
+    public void testFailableDoubleFunctionNop() throws Throwable {
+        assertNull(FailableDoubleFunction.nop().apply(Double.MAX_VALUE), "Expect NOP to return null");
+    }
+
+    @Test
+    public void testFailableDoubleToIntFunctionNop() throws Throwable {
+        assertEquals(0, FailableDoubleToIntFunction.nop().applyAsInt(Double.MAX_VALUE), "Expect NOP to return 0");
+    }
+
+    @Test
+    public void testFailableDoubleToLongFunctionNop() throws Throwable {
+        assertEquals(0, FailableDoubleToLongFunction.nop().applyAsLong(Double.MAX_VALUE), "Expect NOP to return 0");
+    }
+
+    @Test
+    public void testFailableIntFunctionNop() throws Throwable {
+        assertNull(FailableIntFunction.nop().apply(Integer.MAX_VALUE), "Expect NOP to return null");
+    }
+
+    @Test
+    public void testFailableIntToDoubleFunctionNop() throws Throwable {
+        assertEquals(0, FailableIntToDoubleFunction.nop().applyAsDouble(Integer.MAX_VALUE), "Expect NOP to return 0");
+    }
+
+    @Test
+    public void testFailableIntToLongFunctionNop() throws Throwable {
+        assertEquals(0, FailableIntToLongFunction.nop().applyAsLong(Integer.MAX_VALUE), "Expect NOP to return 0");
+    }
+
+    @Test
+    public void testFailableLongFunctionNop() throws Throwable {
+        assertNull(FailableLongFunction.nop().apply(Long.MAX_VALUE), "Expect NOP to return null");
+    }
+
+    @Test
+    public void testFailableLongToDoubleFunctionNop() throws Throwable {
+        assertEquals(0, FailableLongToDoubleFunction.nop().applyAsDouble(Long.MAX_VALUE), "Expect NOP to return 0");
+    }
+
+    @Test
+    public void testFailableLongToIntFunctionNop() throws Throwable {
+        assertEquals(0, FailableLongToIntFunction.nop().applyAsInt(Long.MAX_VALUE), "Expect NOP to return 0");
+    }
+
+    @Test
+    public void testFailableObjDoubleConsumerNop() throws Throwable {
+        // Expect nothing thrown
+        FailableObjDoubleConsumer.nop().accept("Foo", Double.MAX_VALUE);
+    }
+
+    @Test
+    public void testFailableObjIntConsumerNop() throws Throwable {
+        // Expect nothing thrown
+        FailableObjIntConsumer.nop().accept("Foo", Integer.MAX_VALUE);
+    }
+
+    @Test
+    public void testFailableObjLongConsumerNop() throws Throwable {
+        // Expect nothing thrown
+        FailableObjLongConsumer.nop().accept("Foo", Long.MAX_VALUE);
+    }
+
+    @Test
+    public void testFailableToDoubleBiFunctionNop() throws Throwable {
+        assertEquals(0, FailableToDoubleBiFunction.nop().applyAsDouble("Foo", "Bar"), "Expect NOP to return 0");
+    }
+
+    @Test
+    public void testFailableToDoubleFunctionNop() throws Throwable {
+        assertEquals(0, FailableToDoubleFunction.nop().applyAsDouble("Foo"), "Expect NOP to return 0");
+    }
+
+    @Test
+    public void testFailableToIntBiFunctionNop() throws Throwable {
+        assertEquals(0, FailableToIntBiFunction.nop().applyAsInt("Foo", "Bar"), "Expect NOP to return 0");
+    }
+
+    @Test
+    public void testFailableToIntFunctionNop() throws Throwable {
+        assertEquals(0, FailableToIntFunction.nop().applyAsInt("Foo"), "Expect NOP to return 0");
+    }
+
+    @Test
+    public void testFailableToLongBiFunctionNop() throws Throwable {
+        assertEquals(0, FailableToLongBiFunction.nop().applyAsLong("Foo", "Bar"), "Expect NOP to return 0");
+    }
+
+    @Test
+    public void testFailableToLongFunctionNop() throws Throwable {
+        assertEquals(0, FailableToLongFunction.nop().applyAsLong("Foo"), "Expect NOP to return 0");
+    }
+
+    @Test
     public void testFunction() {
         final Testable<?, ?> testable = new Testable<>(ILLEGAL_STATE_EXCEPTION);
         final FailableFunction<Throwable, Integer, Throwable> failableFunction = th -> {
@@ -944,6 +1060,11 @@ public class FailableFunctionsTest {
         nop.compose(nop);
         // Documented in Javadoc edge-case.
         assertThrows(NullPointerException.class, () -> failing.compose(null));
+    }
+
+    @Test
+    public void testFunctionFunction() throws Exception {
+        assertEquals("foo", FailableFunction.function(this::throwingFunction).andThen(this::throwingFunction).apply("foo"));
     }
 
     @Test
@@ -1041,6 +1162,29 @@ public class FailableFunctionsTest {
 
         testable.setThrowable(null);
         final long i = Failable.getAsLong(testable::testAsLongPrimitive);
+        assertEquals(0, i);
+    }
+
+    @Test
+    public void testGetAsShortSupplier() {
+        final Testable<?, ?> testable = new Testable<>(ILLEGAL_STATE_EXCEPTION);
+        Throwable e = assertThrows(IllegalStateException.class,
+            () -> Failable.getAsShort(testable::testAsShortPrimitive));
+        assertSame(ILLEGAL_STATE_EXCEPTION, e);
+
+        testable.setThrowable(ERROR);
+        e = assertThrows(OutOfMemoryError.class, () -> Failable.getAsShort(testable::testAsShortPrimitive));
+        assertSame(ERROR, e);
+
+        final IOException ioe = new IOException("Unknown I/O error");
+        testable.setThrowable(ioe);
+        e = assertThrows(UncheckedIOException.class, () -> Failable.getAsShort(testable::testAsShortPrimitive));
+        final Throwable t = e.getCause();
+        assertNotNull(t);
+        assertSame(ioe, t);
+
+        testable.setThrowable(null);
+        final short i = Failable.getAsShort(testable::testAsShortPrimitive);
         assertEquals(0, i);
     }
 
@@ -1326,6 +1470,17 @@ public class FailableFunctionsTest {
     }
 
     @Test
+    public void testPredicateOr() throws Throwable {
+        assertTrue(FailablePredicate.TRUE.or(FailablePredicate.TRUE).test(null));
+        assertTrue(FailablePredicate.TRUE.or(FailablePredicate.FALSE).test(null));
+        assertTrue(FailablePredicate.FALSE.or(FailablePredicate.TRUE).test(null));
+        assertFalse(FailablePredicate.FALSE.or(FailablePredicate.FALSE).test(null));
+        // null tests
+        assertThrows(NullPointerException.class, () -> assertFalse(FailablePredicate.FALSE.or(null).test(null)));
+        assertThrows(NullPointerException.class, () -> assertTrue(FailablePredicate.TRUE.or(null).test(null)));
+    }
+
+    @Test
     public void testRunnable() {
         FailureOnOddInvocations.invocations = 0;
         final UndeclaredThrowableException e = assertThrows(UndeclaredThrowableException.class,
@@ -1340,7 +1495,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -1371,7 +1526,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -1401,7 +1556,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -1431,11 +1586,26 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using String and IOExceptions as
+     * generic test types.
+     */
+    @Test
+    public void testThrows_FailableBooleanSupplier_IOException() {
+        new FailableBooleanSupplier<IOException>() {
+
+            @Override
+            public boolean getAsBoolean() throws IOException {
+                throw new IOException("test");
+            }
+        };
+    }
+
+    /**
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableBooleanSupplier_Object_Throwable() {
+    public void testThrows_FailableBooleanSupplier_Throwable() {
         new FailableBooleanSupplier<Throwable>() {
 
             @Override
@@ -1446,24 +1616,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception using String and IOExceptions as
-     * generic test types.
-     */
-    @Test
-    public void testThrows_FailableBooleanSupplier_String_IOException() {
-        new FailableBooleanSupplier<IOException>() {
-
-            @Override
-            public boolean getAsBoolean() throws IOException {
-                throw new IOException("test");
-            }
-        };
-    }
-
-    ///////////////////////////////////////////////
-
-    /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -1493,7 +1646,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -1525,11 +1678,26 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using String and IOExceptions as
+     * generic test types.
+     */
+    @Test
+    public void testThrows_FailableDoubleBinaryOperator_IOException() {
+        new FailableDoubleBinaryOperator<IOException>() {
+
+            @Override
+            public double applyAsDouble(final double left, final double right) throws IOException {
+                throw new IOException("test");
+            }
+        };
+    }
+
+    /**
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableDoubleBinaryOperator_Object_Throwable() {
+    public void testThrows_FailableDoubleBinaryOperator_Throwable() {
         new FailableDoubleBinaryOperator<Throwable>() {
 
             @Override
@@ -1544,22 +1712,22 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableDoubleBinaryOperator_String_IOException() {
-        new FailableDoubleBinaryOperator<IOException>() {
+    public void testThrows_FailableDoubleConsumer_IOException() {
+        new FailableDoubleConsumer<IOException>() {
 
             @Override
-            public double applyAsDouble(final double left, final double right) throws IOException {
+            public void accept(final double value) throws IOException {
                 throw new IOException("test");
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableDoubleConsumer_Object_Throwable() {
+    public void testThrows_FailableDoubleConsumer_Throwable() {
         new FailableDoubleConsumer<Throwable>() {
 
             @Override
@@ -1575,22 +1743,22 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableDoubleConsumer_String_IOException() {
-        new FailableDoubleConsumer<IOException>() {
+    public void testThrows_FailableDoubleFunction_IOException() {
+        new FailableDoubleFunction<String, IOException>() {
 
             @Override
-            public void accept(final double value) throws IOException {
+            public String apply(final double input) throws IOException {
                 throw new IOException("test");
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableDoubleFunction_Object_Throwable() {
+    public void testThrows_FailableDoubleFunction_Throwable() {
         new FailableDoubleFunction<Object, Throwable>() {
 
             @Override
@@ -1605,22 +1773,22 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableDoubleFunction_String_IOException() {
-        new FailableDoubleFunction<String, IOException>() {
+    public void testThrows_FailableDoubleSupplier_IOException() {
+        new FailableDoubleSupplier<IOException>() {
 
             @Override
-            public String apply(final double input) throws IOException {
+            public double getAsDouble() throws IOException {
                 throw new IOException("test");
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableDoubleSupplier_Object_Throwable() {
+    public void testThrows_FailableDoubleSupplier_Throwable() {
         new FailableDoubleSupplier<Throwable>() {
 
             @Override
@@ -1635,22 +1803,22 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableDoubleSupplier_String_IOException() {
-        new FailableDoubleSupplier<IOException>() {
+    public void testThrows_FailableDoubleToIntFunction_IOException() {
+        new FailableDoubleToIntFunction<IOException>() {
 
             @Override
-            public double getAsDouble() throws IOException {
+            public int applyAsInt(final double value) throws IOException {
                 throw new IOException("test");
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableDoubleToIntFunction_Object_Throwable() {
+    public void testThrows_FailableDoubleToIntFunction_Throwable() {
         new FailableDoubleToIntFunction<Throwable>() {
 
             @Override
@@ -1665,37 +1833,7 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableDoubleToIntFunction_String_IOException() {
-        new FailableDoubleToIntFunction<IOException>() {
-
-            @Override
-            public int applyAsInt(final double value) throws IOException {
-                throw new IOException("test");
-            }
-        };
-    }
-
-    /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
-     * Object and Throwable.
-     */
-    @Test
-    public void testThrows_FailableDoubleToLongFunction_Object_Throwable() {
-        new FailableDoubleToLongFunction<Throwable>() {
-
-            @Override
-            public int applyAsLong(final double value) throws Throwable {
-                throw new IOException("test");
-            }
-        };
-    }
-
-    /**
-     * Tests that our failable interface is properly defined to throw any exception using String and IOExceptions as
-     * generic test types.
-     */
-    @Test
-    public void testThrows_FailableDoubleToLongFunction_String_IOException() {
+    public void testThrows_FailableDoubleToLongFunction_IOException() {
         new FailableDoubleToLongFunction<IOException>() {
 
             @Override
@@ -1706,7 +1844,22 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
+     * Object and Throwable.
+     */
+    @Test
+    public void testThrows_FailableDoubleToLongFunction_Throwable() {
+        new FailableDoubleToLongFunction<Throwable>() {
+
+            @Override
+            public int applyAsLong(final double value) throws Throwable {
+                throw new IOException("test");
+            }
+        };
+    }
+
+    /**
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -1736,11 +1889,26 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using String and IOExceptions as
+     * generic test types.
+     */
+    @Test
+    public void testThrows_FailableIntBinaryOperator_IOException() {
+        new FailableIntBinaryOperator<IOException>() {
+
+            @Override
+            public int applyAsInt(final int left, final int right) throws IOException {
+                throw new IOException("test");
+            }
+        };
+    }
+
+    /**
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableIntBinaryOperator_Object_Throwable() {
+    public void testThrows_FailableIntBinaryOperator_Throwable() {
         new FailableIntBinaryOperator<Throwable>() {
 
             @Override
@@ -1755,22 +1923,22 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableIntBinaryOperator_String_IOException() {
-        new FailableIntBinaryOperator<IOException>() {
+    public void testThrows_FailableIntConsumer_IOException() {
+        new FailableIntConsumer<IOException>() {
 
             @Override
-            public int applyAsInt(final int left, final int right) throws IOException {
+            public void accept(final int value) throws IOException {
                 throw new IOException("test");
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableIntConsumer_Object_Throwable() {
+    public void testThrows_FailableIntConsumer_Throwable() {
         new FailableIntConsumer<Throwable>() {
 
             @Override
@@ -1782,22 +1950,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception using String and IOExceptions as
-     * generic test types.
-     */
-    @Test
-    public void testThrows_FailableIntConsumer_String_IOException() {
-        new FailableIntConsumer<IOException>() {
-
-            @Override
-            public void accept(final int value) throws IOException {
-                throw new IOException("test");
-            }
-        };
-    }
-
-    /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -1827,11 +1980,26 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using String and IOExceptions as
+     * generic test types.
+     */
+    @Test
+    public void testThrows_FailableIntSupplier_IOException() {
+        new FailableIntSupplier<IOException>() {
+
+            @Override
+            public int getAsInt() throws IOException {
+                throw new IOException("test");
+            }
+        };
+    }
+
+    /**
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableIntSupplier_Object_Throwable() {
+    public void testThrows_FailableIntSupplier_Throwable() {
         new FailableIntSupplier<Throwable>() {
 
             @Override
@@ -1846,22 +2014,22 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableIntSupplier_String_IOException() {
-        new FailableIntSupplier<IOException>() {
+    public void testThrows_FailableIntToDoubleFunction_IOException() {
+        new FailableIntToDoubleFunction<IOException>() {
 
             @Override
-            public int getAsInt() throws IOException {
+            public double applyAsDouble(final int value) throws IOException {
                 throw new IOException("test");
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableIntToDoubleFunction_Object_Throwable() {
+    public void testThrows_FailableIntToDoubleFunction_Throwable() {
         new FailableIntToDoubleFunction<Throwable>() {
 
             @Override
@@ -1876,22 +2044,22 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableIntToDoubleFunction_String_IOException() {
-        new FailableIntToDoubleFunction<IOException>() {
+    public void testThrows_FailableIntToLongFunction_IOException() {
+        new FailableIntToLongFunction<IOException>() {
 
             @Override
-            public double applyAsDouble(final int value) throws IOException {
+            public long applyAsLong(final int value) throws IOException {
                 throw new IOException("test");
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableIntToLongFunction_Object_Throwable() {
+    public void testThrows_FailableIntToLongFunction_Throwable() {
         new FailableIntToLongFunction<Throwable>() {
 
             @Override
@@ -1906,22 +2074,22 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableIntToLongFunction_String_IOException() {
-        new FailableIntToLongFunction<IOException>() {
+    public void testThrows_FailableLongBinaryOperator_IOException() {
+        new FailableLongBinaryOperator<IOException>() {
 
             @Override
-            public long applyAsLong(final int value) throws IOException {
+            public long applyAsLong(final long left, final long right) throws IOException {
                 throw new IOException("test");
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableLongBinaryOperator_Object_Throwable() {
+    public void testThrows_FailableLongBinaryOperator_Throwable() {
         new FailableLongBinaryOperator<Throwable>() {
 
             @Override
@@ -1936,22 +2104,23 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableLongBinaryOperator_String_IOException() {
-        new FailableLongBinaryOperator<IOException>() {
+    public void testThrows_FailableLongConsumer_IOException() {
+        new FailableLongConsumer<IOException>() {
 
             @Override
-            public long applyAsLong(final long left, final long right) throws IOException {
+            public void accept(final long object) throws IOException {
                 throw new IOException("test");
+
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableLongConsumer_Object_Throwable() {
+    public void testThrows_FailableLongConsumer_Throwable() {
         new FailableLongConsumer<Throwable>() {
 
             @Override
@@ -1967,23 +2136,22 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableLongConsumer_String_IOException() {
-        new FailableLongConsumer<IOException>() {
+    public void testThrows_FailableLongFunction_IOException() {
+        new FailableLongFunction<String, IOException>() {
 
             @Override
-            public void accept(final long object) throws IOException {
+            public String apply(final long input) throws IOException {
                 throw new IOException("test");
-
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableLongFunction_Object_Throwable() {
+    public void testThrows_FailableLongFunction_Throwable() {
         new FailableLongFunction<Object, Throwable>() {
 
             @Override
@@ -1998,22 +2166,22 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableLongFunction_String_IOException() {
-        new FailableLongFunction<String, IOException>() {
+    public void testThrows_FailableLongSupplier_IOException() {
+        new FailableLongSupplier<IOException>() {
 
             @Override
-            public String apply(final long input) throws IOException {
+            public long getAsLong() throws IOException {
                 throw new IOException("test");
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableLongSupplier_Object_Throwable() {
+    public void testThrows_FailableLongSupplier_Throwable() {
         new FailableLongSupplier<Throwable>() {
 
             @Override
@@ -2028,22 +2196,22 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableLongSupplier_String_IOException() {
-        new FailableLongSupplier<IOException>() {
+    public void testThrows_FailableLongToDoubleFunction_IOException() {
+        new FailableLongToDoubleFunction<IOException>() {
 
             @Override
-            public long getAsLong() throws IOException {
+            public double applyAsDouble(final long value) throws IOException {
                 throw new IOException("test");
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableLongToDoubleFunction_Object_Throwable() {
+    public void testThrows_FailableLongToDoubleFunction_Throwable() {
         new FailableLongToDoubleFunction<Throwable>() {
 
             @Override
@@ -2058,37 +2226,7 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableLongToDoubleFunction_String_IOException() {
-        new FailableLongToDoubleFunction<IOException>() {
-
-            @Override
-            public double applyAsDouble(final long value) throws IOException {
-                throw new IOException("test");
-            }
-        };
-    }
-
-    /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
-     * Object and Throwable.
-     */
-    @Test
-    public void testThrows_FailableLongToIntFunction_Object_Throwable() {
-        new FailableLongToIntFunction<Throwable>() {
-
-            @Override
-            public int applyAsInt(final long value) throws Throwable {
-                throw new IOException("test");
-            }
-        };
-    }
-
-    /**
-     * Tests that our failable interface is properly defined to throw any exception using String and IOExceptions as
-     * generic test types.
-     */
-    @Test
-    public void testThrows_FailableLongToIntFunction_String_IOException() {
+    public void testThrows_FailableLongToIntFunction_IOException() {
         new FailableLongToIntFunction<IOException>() {
 
             @Override
@@ -2099,7 +2237,22 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
+     * Object and Throwable.
+     */
+    @Test
+    public void testThrows_FailableLongToIntFunction_Throwable() {
+        new FailableLongToIntFunction<Throwable>() {
+
+            @Override
+            public int applyAsInt(final long value) throws Throwable {
+                throw new IOException("test");
+            }
+        };
+    }
+
+    /**
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -2130,7 +2283,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -2161,7 +2314,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -2192,7 +2345,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -2222,11 +2375,26 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using String and IOExceptions as
+     * generic test types.
+     */
+    @Test
+    public void testThrows_FailableRunnable_IOException() {
+        new FailableRunnable<IOException>() {
+
+            @Override
+            public void run() throws IOException {
+                throw new IOException("test");
+            }
+        };
+    }
+
+    /**
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
-    public void testThrows_FailableRunnable_Object_Throwable() {
+    public void testThrows_FailableRunnable_Throwable() {
         new FailableRunnable<Throwable>() {
 
             @Override
@@ -2242,18 +2410,33 @@ public class FailableFunctionsTest {
      * generic test types.
      */
     @Test
-    public void testThrows_FailableRunnable_String_IOException() {
-        new FailableRunnable<IOException>() {
+    public void testThrows_FailableShortSupplier_IOException() {
+        new FailableShortSupplier<IOException>() {
 
             @Override
-            public void run() throws IOException {
+            public short getAsShort() throws IOException {
                 throw new IOException("test");
             }
         };
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
+     * Object and Throwable.
+     */
+    @Test
+    public void testThrows_FailableShortSupplier_Throwable() {
+        new FailableShortSupplier<Throwable>() {
+
+            @Override
+            public short getAsShort() throws Throwable {
+                throw new IOException("test");
+            }
+        };
+    }
+
+    /**
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -2283,7 +2466,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -2313,7 +2496,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -2343,7 +2526,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -2373,7 +2556,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -2403,7 +2586,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -2433,7 +2616,7 @@ public class FailableFunctionsTest {
     }
 
     /**
-     * Tests that our failable interface is properly defined to throw any exception. using the top level generic types
+     * Tests that our failable interface is properly defined to throw any exception using the top level generic types
      * Object and Throwable.
      */
     @Test
@@ -2488,6 +2671,10 @@ public class FailableFunctionsTest {
         closeable.reset();
         Failable.tryWithResources(() -> consumer.accept(null), closeable::close);
         assertTrue(closeable.isClosed());
+    }
+
+    private String throwingFunction(final String input) throws Exception {
+        return input;
     }
 
 }

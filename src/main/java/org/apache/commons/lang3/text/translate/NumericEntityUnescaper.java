@@ -24,20 +24,35 @@ import java.util.EnumSet;
 
 /**
  * Translate XML numeric entities of the form &amp;#[xX]?\d+;? to
- * the specific codepoint.
+ * the specific code point.
  *
- * Note that the semi-colon is optional.
+ * Note that the semicolon is optional.
  *
  * @since 3.0
- * @deprecated as of 3.6, use commons-text
+ * @deprecated As of 3.6, use Apache Commons Text
  * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/translate/NumericEntityUnescaper.html">
  * NumericEntityUnescaper</a> instead
  */
 @Deprecated
 public class NumericEntityUnescaper extends CharSequenceTranslator {
 
+    /** Enumerates NumericEntityUnescaper options for unescaping. */
     public enum OPTION {
-        semiColonRequired, semiColonOptional, errorIfNoSemiColon
+
+        /**
+         * Require a semicolon.
+         */
+        semiColonRequired,
+
+        /**
+         * Do not require a semicolon.
+         */
+        semiColonOptional,
+
+        /**
+         * Throw an exception if a semicolon is missing.
+         */
+        errorIfNoSemiColon
     }
 
     // TODO?: Create an OptionsSet class to hide some of the conditional logic below
@@ -47,7 +62,7 @@ public class NumericEntityUnescaper extends CharSequenceTranslator {
      * Create a UnicodeUnescaper.
      *
      * The constructor takes a list of options, only one type of which is currently
-     * available (whether to allow, error or ignore the semi-colon on the end of a
+     * available (whether to allow, error or ignore the semicolon on the end of a
      * numeric entity to being missing).
      *
      * For example, to support numeric entities without a ';':
@@ -112,20 +127,20 @@ public class NumericEntityUnescaper extends CharSequenceTranslator {
             if (!semiNext) {
                 if (isSet(OPTION.semiColonRequired)) {
                     return 0;
-                } else
+                }
                 if (isSet(OPTION.errorIfNoSemiColon)) {
                     throw new IllegalArgumentException("Semi-colon required at end of numeric entity");
                 }
             }
 
-            int entityValue;
+            final int entityValue;
             try {
                 if (isHex) {
                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
                 } else {
                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 10);
                 }
-            } catch(final NumberFormatException nfe) {
+            } catch (final NumberFormatException nfe) {
                 return 0;
             }
 

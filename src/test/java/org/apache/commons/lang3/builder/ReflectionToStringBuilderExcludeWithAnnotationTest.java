@@ -21,14 +21,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
+import org.apache.commons.lang3.AbstractLangTest;
 import org.junit.jupiter.api.Test;
 
 /**
  * Test class for ToStringExclude annotation
  */
-public class ReflectionToStringBuilderExcludeWithAnnotationTest {
+public class ReflectionToStringBuilderExcludeWithAnnotationTest extends AbstractLangTest {
 
-    class TestFixture {
+    final class TestFixture {
         @ToStringExclude
         private final String excludedField = EXCLUDED_FIELD_VALUE;
 

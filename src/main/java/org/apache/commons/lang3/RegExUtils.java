@@ -16,17 +16,42 @@
  */
 package org.apache.commons.lang3;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * <p>Helpers to process Strings using regular expressions.</p>
+ * Helpers to process Strings using regular expressions.
  * @see java.util.regex.Pattern
  * @since 3.8
  */
 public class RegExUtils {
 
     /**
-     * <p>Removes each substring of the text String that matches the given regular expression pattern.</p>
+     * Compiles the given regular expression into a pattern with the {@link Pattern#DOTALL} flag.
+     *
+     * @param regex The expression to be compiled
+     * @return the given regular expression compiled into a pattern with the {@link Pattern#DOTALL} flag.
+     * @since 3.13.0
+     */
+    public static Pattern dotAll(final String regex) {
+        return Pattern.compile(regex, Pattern.DOTALL);
+    }
+
+    /**
+     * Compiles the given regular expression into a pattern with the {@link Pattern#DOTALL} flag, then creates a matcher that will match the given text against
+     * this pattern.
+     *
+     * @param regex The expression to be compiled.
+     * @param text  The character sequence to be matched.
+     * @return A new matcher for this pattern.
+     * @since 3.13.0
+     */
+    public static Matcher dotAllMatcher(final String regex, final String text) {
+        return dotAll(regex).matcher(text);
+    }
+
+    /**
+     * Removes each substring of the text String that matches the given regular expression pattern.
      *
      * This method is a {@code null} safe equivalent to:
      * <ul>
@@ -62,7 +87,7 @@ public class RegExUtils {
     }
 
     /**
-     * <p>Removes each substring of the text String that matches the given regular expression.</p>
+     * Removes each substring of the text String that matches the given regular expression.
      *
      * This method is a {@code null} safe equivalent to:
      * <ul>
@@ -108,7 +133,7 @@ public class RegExUtils {
     }
 
     /**
-     * <p>Removes the first substring of the text string that matches the given regular expression pattern.</p>
+     * Removes the first substring of the text string that matches the given regular expression pattern.
      *
      * This method is a {@code null} safe equivalent to:
      * <ul>
@@ -144,7 +169,7 @@ public class RegExUtils {
     }
 
     /**
-     * <p>Removes the first substring of the text string that matches the given regular expression.</p>
+     * Removes the first substring of the text string that matches the given regular expression.
      *
      * This method is a {@code null} safe equivalent to:
      * <ul>
@@ -189,7 +214,7 @@ public class RegExUtils {
     }
 
     /**
-     * <p>Removes each substring of the source String that matches the given regular expression using the DOTALL option.</p>
+     * Removes each substring of the source String that matches the given regular expression using the DOTALL option.
      *
      * This call is a {@code null} safe equivalent to:
      * <ul>
@@ -210,7 +235,7 @@ public class RegExUtils {
      *            the source string
      * @param regex
      *            the regular expression to which this string is to be matched
-     * @return The resulting {@code String}
+     * @return The resulting {@link String}
      * @see #replacePattern(String, String, String)
      * @see String#replaceAll(String, String)
      * @see Pattern#DOTALL
@@ -220,7 +245,7 @@ public class RegExUtils {
     }
 
     /**
-     * <p>Replaces each substring of the text String that matches the given regular expression pattern with the given replacement.</p>
+     * Replaces each substring of the text String that matches the given regular expression pattern with the given replacement.
      *
      * This method is a {@code null} safe equivalent to:
      * <ul>
@@ -256,15 +281,15 @@ public class RegExUtils {
      * @see java.util.regex.Pattern
      */
     public static String replaceAll(final String text, final Pattern regex, final String replacement) {
-        if (text == null || regex == null || replacement == null) {
+        if (ObjectUtils.anyNull(text, regex, replacement)) {
             return text;
         }
         return regex.matcher(text).replaceAll(replacement);
     }
 
     /**
-     * <p>Replaces each substring of the text String that matches the given regular expression
-     * with the given replacement.</p>
+     * Replaces each substring of the text String that matches the given regular expression
+     * with the given replacement.
      *
      * This method is a {@code null} safe equivalent to:
      * <ul>
@@ -310,15 +335,15 @@ public class RegExUtils {
      * @see java.util.regex.Pattern#DOTALL
      */
     public static String replaceAll(final String text, final String regex, final String replacement) {
-        if (text == null || regex == null || replacement == null) {
+        if (ObjectUtils.anyNull(text, regex, replacement)) {
             return text;
         }
         return text.replaceAll(regex, replacement);
     }
 
     /**
-     * <p>Replaces the first substring of the text string that matches the given regular expression pattern
-     * with the given replacement.</p>
+     * Replaces the first substring of the text string that matches the given regular expression pattern
+     * with the given replacement.
      *
      * This method is a {@code null} safe equivalent to:
      * <ul>
@@ -353,15 +378,15 @@ public class RegExUtils {
      * @see java.util.regex.Pattern
      */
     public static String replaceFirst(final String text, final Pattern regex, final String replacement) {
-        if (text == null || regex == null|| replacement == null ) {
+        if (text == null || regex == null || replacement == null) {
             return text;
         }
         return regex.matcher(text).replaceFirst(replacement);
     }
 
     /**
-     * <p>Replaces the first substring of the text string that matches the given regular expression
-     * with the given replacement.</p>
+     * Replaces the first substring of the text string that matches the given regular expression
+     * with the given replacement.
      *
      * This method is a {@code null} safe equivalent to:
      * <ul>
@@ -405,15 +430,15 @@ public class RegExUtils {
      * @see java.util.regex.Pattern#DOTALL
      */
     public static String replaceFirst(final String text, final String regex, final String replacement) {
-        if (text == null || regex == null|| replacement == null ) {
+        if (text == null || regex == null || replacement == null) {
             return text;
         }
         return text.replaceFirst(regex, replacement);
     }
 
     /**
-     * <p>Replaces each substring of the source String that matches the given regular expression with the given
-     * replacement using the {@link Pattern#DOTALL} option. DOTALL is also known as single-line mode in Perl.</p>
+     * Replaces each substring of the source String that matches the given regular expression with the given
+     * replacement using the {@link Pattern#DOTALL} option. DOTALL is also known as single-line mode in Perl.
      *
      * This call is a {@code null} safe equivalent to:
      * <ul>
@@ -443,16 +468,16 @@ public class RegExUtils {
      *            the regular expression to which this string is to be matched
      * @param replacement
      *            the string to be substituted for each match
-     * @return The resulting {@code String}
+     * @return The resulting {@link String}
      * @see #replaceAll(String, String, String)
      * @see String#replaceAll(String, String)
      * @see Pattern#DOTALL
      */
     public static String replacePattern(final String text, final String regex, final String replacement) {
-        if (text == null || regex == null || replacement == null) {
+        if (ObjectUtils.anyNull(text, regex, replacement)) {
             return text;
         }
-        return Pattern.compile(regex, Pattern.DOTALL).matcher(text).replaceAll(replacement);
+        return dotAllMatcher(regex, text).replaceAll(replacement);
     }
 
 }

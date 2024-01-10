@@ -28,12 +28,11 @@ import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.function.FailableFunction;
 
 /**
- * <p>
  * Combines the monitor and visitor pattern to work with {@link java.util.concurrent.locks.Lock locked objects}. Locked
  * objects are an alternative to synchronization. This, on Wikipedia, is known as the Visitor pattern
  * (https://en.wikipedia.org/wiki/Visitor_pattern), and from the "Gang of Four" "Design Patterns" book's Visitor pattern
  * [Gamma, E., Helm, R., &amp; Johnson, R. (1998). Visitor. In Design patterns elements of reusable object oriented software (pp. 331-344). Reading: Addison Wesley.].
- * </p>
+ *
  * <p>
  * Locking is preferable, if there is a distinction between read access (multiple threads may have read access
  * concurrently), and write access (only one thread may have write access at any given time). In comparison,
@@ -118,8 +117,7 @@ public class LockingVisitors {
          * @param readLockSupplier Supplies the read lock, usually from the lock object.
          * @param writeLockSupplier Supplies the write lock, usually from the lock object.
          */
-        protected LockVisitor(final O object, L lock, Supplier<Lock> readLockSupplier, Supplier<Lock> writeLockSupplier) {
-            super();
+        protected LockVisitor(final O object, final L lock, final Supplier<Lock> readLockSupplier, final Supplier<Lock> writeLockSupplier) {
             this.object = Objects.requireNonNull(object, "object");
             this.lock = Objects.requireNonNull(lock, "lock");
             this.readLockSupplier = Objects.requireNonNull(readLockSupplier, "readLockSupplier");
@@ -127,10 +125,9 @@ public class LockingVisitors {
         }
 
         /**
-         * <p>
          * Provides read (shared, non-exclusive) access to the locked (hidden) object. More precisely, what the method
          * will do (in the given order):
-         * </p>
+         *
          * <ol>
          * <li>Obtain a read (shared) lock on the locked (hidden) object. The current thread may block, until such a
          * lock is granted.</li>
@@ -144,15 +141,14 @@ public class LockingVisitors {
          * @see #acceptWriteLocked(FailableConsumer)
          * @see #applyReadLocked(FailableFunction)
          */
-        public void acceptReadLocked(FailableConsumer<O, ?> consumer) {
+        public void acceptReadLocked(final FailableConsumer<O, ?> consumer) {
             lockAcceptUnlock(readLockSupplier, consumer);
         }
 
         /**
-         * <p>
          * Provides write (exclusive) access to the locked (hidden) object. More precisely, what the method will do (in
          * the given order):
-         * </p>
+         *
          * <ol>
          * <li>Obtain a write (shared) lock on the locked (hidden) object. The current thread may block, until such a
          * lock is granted.</li>
@@ -171,10 +167,9 @@ public class LockingVisitors {
         }
 
         /**
-         * <p>
          * Provides read (shared, non-exclusive) access to the locked (hidden) object for the purpose of computing a
          * result object. More precisely, what the method will do (in the given order):
-         * </p>
+         *
          * <ol>
          * <li>Obtain a read (shared) lock on the locked (hidden) object. The current thread may block, until such a
          * lock is granted.</li>
@@ -206,15 +201,14 @@ public class LockingVisitors {
          * @see #acceptReadLocked(FailableConsumer)
          * @see #applyWriteLocked(FailableFunction)
          */
-        public <T> T applyReadLocked(FailableFunction<O, T, ?> function) {
+        public <T> T applyReadLocked(final FailableFunction<O, T, ?> function) {
             return lockApplyUnlock(readLockSupplier, function);
         }
 
         /**
-         * <p>
          * Provides write (exclusive) access to the locked (hidden) object for the purpose of computing a result object.
          * More precisely, what the method will do (in the given order):
-         * </p>
+         *
          * <ol>
          * <li>Obtain a read (shared) lock on the locked (hidden) object. The current thread may block, until such a
          * lock is granted.</li>
@@ -272,7 +266,7 @@ public class LockingVisitors {
             lock.lock();
             try {
                 consumer.accept(object);
-            } catch (Throwable t) {
+            } catch (final Throwable t) {
                 throw Failable.rethrow(t);
             } finally {
                 lock.unlock();
@@ -299,7 +293,7 @@ public class LockingVisitors {
             lock.lock();
             try {
                 return function.apply(object);
-            } catch (Throwable t) {
+            } catch (final Throwable t) {
                 throw Failable.rethrow(t);
             } finally {
                 lock.unlock();
@@ -349,9 +343,22 @@ public class LockingVisitors {
          * @param object The locked (hidden) object. The caller is supposed to drop all references to the locked object.
          * @param stampedLock the lock to use.
          */
-        protected StampedLockVisitor(final O object, StampedLock stampedLock) {
+        protected StampedLockVisitor(final O object, final StampedLock stampedLock) {
             super(object, stampedLock, stampedLock::asReadLock, stampedLock::asWriteLock);
         }
+    }
+
+    /**
+     * Creates a new instance of {@link ReadWriteLockVisitor} with the given (hidden) object and lock.
+     *
+     * @param <O> The locked objects type.
+     * @param object The locked (hidden) object.
+     * @param readWriteLock The lock to use.
+     * @return The created instance, a {@link StampedLockVisitor lock} for the given object.
+     * @since 3.13.0
+     */
+    public static <O> ReadWriteLockVisitor<O> create(final O object, final ReadWriteLock readWriteLock) {
+        return new LockingVisitors.ReadWriteLockVisitor<>(object, readWriteLock);
     }
 
     /**
@@ -362,7 +369,7 @@ public class LockingVisitors {
      * @return The created instance, a {@link StampedLockVisitor lock} for the given object.
      */
     public static <O> ReadWriteLockVisitor<O> reentrantReadWriteLockVisitor(final O object) {
-        return new LockingVisitors.ReadWriteLockVisitor<>(object, new ReentrantReadWriteLock());
+        return create(object, new ReentrantReadWriteLock());
     }
 
     /**

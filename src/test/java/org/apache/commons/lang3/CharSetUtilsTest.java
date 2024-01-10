@@ -30,9 +30,8 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests {@link org.apache.commons.lang3.CharSetUtils}.
  */
-public class CharSetUtilsTest  {
+public class CharSetUtilsTest extends AbstractLangTest {
 
-    //-----------------------------------------------------------------------
     @Test
     public void testConstructor() {
         assertNotNull(new CharSetUtils());
@@ -43,48 +42,6 @@ public class CharSetUtilsTest  {
         assertFalse(Modifier.isFinal(CharSetUtils.class.getModifiers()));
     }
 
-    //-----------------------------------------------------------------------
-    @Test
-    public void testSqueeze_StringString() {
-        assertNull(CharSetUtils.squeeze(null, (String) null));
-        assertNull(CharSetUtils.squeeze(null, ""));
-
-        assertEquals("", CharSetUtils.squeeze("", (String) null));
-        assertEquals("", CharSetUtils.squeeze("", ""));
-        assertEquals("", CharSetUtils.squeeze("", "a-e"));
-
-        assertEquals("hello", CharSetUtils.squeeze("hello", (String) null));
-        assertEquals("hello", CharSetUtils.squeeze("hello", ""));
-        assertEquals("hello", CharSetUtils.squeeze("hello", "a-e"));
-        assertEquals("helo", CharSetUtils.squeeze("hello", "l-p"));
-        assertEquals("heloo", CharSetUtils.squeeze("helloo", "l"));
-        assertEquals("hello", CharSetUtils.squeeze("helloo", "^l"));
-    }
-
-    @Test
-    public void testSqueeze_StringStringarray() {
-        assertNull(CharSetUtils.squeeze(null, (String[]) null));
-        assertNull(CharSetUtils.squeeze(null));
-        assertNull(CharSetUtils.squeeze(null, null));
-        assertNull(CharSetUtils.squeeze(null, "el"));
-
-        assertEquals("", CharSetUtils.squeeze("", (String[]) null));
-        assertEquals("", CharSetUtils.squeeze(""));
-        assertEquals("", CharSetUtils.squeeze("", null));
-        assertEquals("", CharSetUtils.squeeze("", "a-e"));
-
-        assertEquals("hello", CharSetUtils.squeeze("hello", (String[]) null));
-        assertEquals("hello", CharSetUtils.squeeze("hello"));
-        assertEquals("hello", CharSetUtils.squeeze("hello", null));
-        assertEquals("hello", CharSetUtils.squeeze("hello", "a-e"));
-
-        assertEquals("helo", CharSetUtils.squeeze("hello", "el"));
-        assertEquals("hello", CharSetUtils.squeeze("hello", "e"));
-        assertEquals("fofof", CharSetUtils.squeeze("fooffooff", "of"));
-        assertEquals("fof", CharSetUtils.squeeze("fooooff", "fo"));
-    }
-
-    //-----------------------------------------------------------------------
     @Test
     public void testContainsAny_StringString() {
         assertFalse(CharSetUtils.containsAny(null, (String) null));
@@ -124,7 +81,6 @@ public class CharSetUtilsTest  {
         assertFalse(CharSetUtils.containsAny("hello", ""));
     }
 
-    //-----------------------------------------------------------------------
     @Test
     public void testCount_StringString() {
         assertEquals(0, CharSetUtils.count(null, (String) null));
@@ -164,7 +120,48 @@ public class CharSetUtilsTest  {
         assertEquals(0, CharSetUtils.count("hello", ""));
     }
 
-    //-----------------------------------------------------------------------
+    @Test
+    public void testDelete_StringString() {
+        assertNull(CharSetUtils.delete(null, (String) null));
+        assertNull(CharSetUtils.delete(null, ""));
+
+        assertEquals("", CharSetUtils.delete("", (String) null));
+        assertEquals("", CharSetUtils.delete("", ""));
+        assertEquals("", CharSetUtils.delete("", "a-e"));
+
+        assertEquals("hello", CharSetUtils.delete("hello", (String) null));
+        assertEquals("hello", CharSetUtils.delete("hello", ""));
+        assertEquals("hllo", CharSetUtils.delete("hello", "a-e"));
+        assertEquals("he", CharSetUtils.delete("hello", "l-p"));
+        assertEquals("hello", CharSetUtils.delete("hello", "z"));
+    }
+
+    @Test
+    public void testDelete_StringStringarray() {
+        assertNull(CharSetUtils.delete(null, (String[]) null));
+        assertNull(CharSetUtils.delete(null));
+        assertNull(CharSetUtils.delete(null, null));
+        assertNull(CharSetUtils.delete(null, "el"));
+
+        assertEquals("", CharSetUtils.delete("", (String[]) null));
+        assertEquals("", CharSetUtils.delete(""));
+        assertEquals("", CharSetUtils.delete("", null));
+        assertEquals("", CharSetUtils.delete("", "a-e"));
+
+        assertEquals("hello", CharSetUtils.delete("hello", (String[]) null));
+        assertEquals("hello", CharSetUtils.delete("hello"));
+        assertEquals("hello", CharSetUtils.delete("hello", null));
+        assertEquals("hello", CharSetUtils.delete("hello", "xyz"));
+
+        assertEquals("ho", CharSetUtils.delete("hello", "el"));
+        assertEquals("", CharSetUtils.delete("hello", "elho"));
+        assertEquals("hello", CharSetUtils.delete("hello", ""));
+        assertEquals("hello", CharSetUtils.delete("hello", ""));
+        assertEquals("", CharSetUtils.delete("hello", "a-z"));
+        assertEquals("", CharSetUtils.delete("----", "-"));
+        assertEquals("heo", CharSetUtils.delete("hello", "l"));
+    }
+
     @Test
     public void testKeep_StringString() {
         assertNull(CharSetUtils.keep(null, (String) null));
@@ -207,47 +204,44 @@ public class CharSetUtilsTest  {
         assertEquals("ll", CharSetUtils.keep("hello", "l"));
     }
 
-    //-----------------------------------------------------------------------
     @Test
-    public void testDelete_StringString() {
-        assertNull(CharSetUtils.delete(null, (String) null));
-        assertNull(CharSetUtils.delete(null, ""));
+    public void testSqueeze_StringString() {
+        assertNull(CharSetUtils.squeeze(null, (String) null));
+        assertNull(CharSetUtils.squeeze(null, ""));
 
-        assertEquals("", CharSetUtils.delete("", (String) null));
-        assertEquals("", CharSetUtils.delete("", ""));
-        assertEquals("", CharSetUtils.delete("", "a-e"));
+        assertEquals("", CharSetUtils.squeeze("", (String) null));
+        assertEquals("", CharSetUtils.squeeze("", ""));
+        assertEquals("", CharSetUtils.squeeze("", "a-e"));
 
-        assertEquals("hello", CharSetUtils.delete("hello", (String) null));
-        assertEquals("hello", CharSetUtils.delete("hello", ""));
-        assertEquals("hllo", CharSetUtils.delete("hello", "a-e"));
-        assertEquals("he", CharSetUtils.delete("hello", "l-p"));
-        assertEquals("hello", CharSetUtils.delete("hello", "z"));
+        assertEquals("hello", CharSetUtils.squeeze("hello", (String) null));
+        assertEquals("hello", CharSetUtils.squeeze("hello", ""));
+        assertEquals("hello", CharSetUtils.squeeze("hello", "a-e"));
+        assertEquals("helo", CharSetUtils.squeeze("hello", "l-p"));
+        assertEquals("heloo", CharSetUtils.squeeze("helloo", "l"));
+        assertEquals("hello", CharSetUtils.squeeze("helloo", "^l"));
     }
 
     @Test
-    public void testDelete_StringStringarray() {
-        assertNull(CharSetUtils.delete(null, (String[]) null));
-        assertNull(CharSetUtils.delete(null));
-        assertNull(CharSetUtils.delete(null, null));
-        assertNull(CharSetUtils.delete(null, "el"));
+    public void testSqueeze_StringStringarray() {
+        assertNull(CharSetUtils.squeeze(null, (String[]) null));
+        assertNull(CharSetUtils.squeeze(null));
+        assertNull(CharSetUtils.squeeze(null, null));
+        assertNull(CharSetUtils.squeeze(null, "el"));
 
-        assertEquals("", CharSetUtils.delete("", (String[]) null));
-        assertEquals("", CharSetUtils.delete(""));
-        assertEquals("", CharSetUtils.delete("", null));
-        assertEquals("", CharSetUtils.delete("", "a-e"));
+        assertEquals("", CharSetUtils.squeeze("", (String[]) null));
+        assertEquals("", CharSetUtils.squeeze(""));
+        assertEquals("", CharSetUtils.squeeze("", null));
+        assertEquals("", CharSetUtils.squeeze("", "a-e"));
 
-        assertEquals("hello", CharSetUtils.delete("hello", (String[]) null));
-        assertEquals("hello", CharSetUtils.delete("hello"));
-        assertEquals("hello", CharSetUtils.delete("hello", null));
-        assertEquals("hello", CharSetUtils.delete("hello", "xyz"));
+        assertEquals("hello", CharSetUtils.squeeze("hello", (String[]) null));
+        assertEquals("hello", CharSetUtils.squeeze("hello"));
+        assertEquals("hello", CharSetUtils.squeeze("hello", null));
+        assertEquals("hello", CharSetUtils.squeeze("hello", "a-e"));
 
-        assertEquals("ho", CharSetUtils.delete("hello", "el"));
-        assertEquals("", CharSetUtils.delete("hello", "elho"));
-        assertEquals("hello", CharSetUtils.delete("hello", ""));
-        assertEquals("hello", CharSetUtils.delete("hello", ""));
-        assertEquals("", CharSetUtils.delete("hello", "a-z"));
-        assertEquals("", CharSetUtils.delete("----", "-"));
-        assertEquals("heo", CharSetUtils.delete("hello", "l"));
+        assertEquals("helo", CharSetUtils.squeeze("hello", "el"));
+        assertEquals("hello", CharSetUtils.squeeze("hello", "e"));
+        assertEquals("fofof", CharSetUtils.squeeze("fooffooff", "of"));
+        assertEquals("fof", CharSetUtils.squeeze("fooooff", "fo"));
     }
 
 }

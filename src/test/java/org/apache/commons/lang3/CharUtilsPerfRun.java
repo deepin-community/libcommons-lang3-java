@@ -56,18 +56,17 @@ run_inlined_CharUtils_isAsciiNumeric: 84,420 milliseconds.
 
  */
 public class CharUtilsPerfRun {
-    private static final String VERSION = "$Id$";
 
     private static final int WARM_UP = 100;
 
     private static final int COUNT = 5000;
 
-    private static final char[] CHAR_SAMPLES;
+    private static final char[] ALL_CHARS;
 
     static {
-        CHAR_SAMPLES = new char[Character.MAX_VALUE];
+        ALL_CHARS = new char[Character.MAX_VALUE];
         for (char i = Character.MIN_VALUE; i < Character.MAX_VALUE; i++) {
-            CHAR_SAMPLES[i] = i;
+            ALL_CHARS[i] = i;
         }
     }
 
@@ -75,51 +74,55 @@ public class CharUtilsPerfRun {
         new CharUtilsPerfRun().run();
     }
 
+    private void printlnTotal(final String prefix, final long startMillis) {
+        final long totalMillis = System.currentTimeMillis() - startMillis;
+        System.out.println(prefix + ": " + NumberFormat.getInstance().format(totalMillis) + " milliseconds.");
+    }
+
     private void printSysInfo() {
-        System.out.println(VERSION);
         System.out.println("Now: " + Calendar.getInstance().getTime());
-        System.out.println(System.getProperty("java.vendor")
+        System.out.println(SystemProperties.getJavaVendor()
                 + " "
-                + System.getProperty("java.runtime.name")
+                + SystemProperties.getJavaRuntimeName()
                 + " "
-                + System.getProperty("java.runtime.version"));
-        System.out.println(System.getProperty("java.vm.vendor")
+                + SystemProperties.getJavaRuntimeVersion());
+        System.out.println(SystemProperties.getJavaVmVendor()
                 + " "
-                + System.getProperty("java.vm.name")
+                + SystemProperties.getJavaVmName()
                 + " "
-                + System.getProperty("java.vm.version"));
-        System.out.println(System.getProperty("os.name")
+                + SystemProperties.getJavaVmVersion());
+        System.out.println(SystemProperties.getOsName()
             + " "
-            + System.getProperty("os.version")
+            + SystemProperties.getOsVersion()
             + " "
-            + System.getProperty("os.arch")
+            + SystemProperties.getOsArch()
             + " "
             + System.getProperty("sun.cpu.isalist"));
     }
 
     private void run() {
         this.printSysInfo();
-        long start;
-        start = System.currentTimeMillis();
-        this.printlnTotal("Do nothing", start);
+        long startMillis;
+        startMillis = System.currentTimeMillis();
+        this.printlnTotal("Do nothing", startMillis);
         run_CharUtils_isAsciiNumeric(WARM_UP);
-        start = System.currentTimeMillis();
+        startMillis = System.currentTimeMillis();
         run_CharUtils_isAsciiNumeric(COUNT);
-        this.printlnTotal("run_CharUtils_isAsciiNumeric", start);
+        this.printlnTotal("run_CharUtils_isAsciiNumeric", startMillis);
         run_inlined_CharUtils_isAsciiNumeric(WARM_UP);
-        start = System.currentTimeMillis();
+        startMillis = System.currentTimeMillis();
         run_inlined_CharUtils_isAsciiNumeric(COUNT);
-        this.printlnTotal("run_inlined_CharUtils_isAsciiNumeric", start);
+        this.printlnTotal("run_inlined_CharUtils_isAsciiNumeric", startMillis);
         run_CharSet(WARM_UP);
-        start = System.currentTimeMillis();
+        startMillis = System.currentTimeMillis();
         run_CharSet(COUNT);
-        this.printlnTotal("run_CharSet", start);
+        this.printlnTotal("run_CharSet", startMillis);
     }
 
     private int run_CharSet(final int loopCount) {
         int t = 0;
         for (int i = 0; i < loopCount; i++) {
-            for (final char ch : CHAR_SAMPLES) {
+            for (final char ch : ALL_CHARS) {
                 final boolean b = CharSet.ASCII_NUMERIC.contains(ch);
                 t += b ? 1 : 0;
             }
@@ -130,7 +133,7 @@ public class CharUtilsPerfRun {
     private int run_CharUtils_isAsciiNumeric(final int loopCount) {
         int t = 0;
         for (int i = 0; i < loopCount; i++) {
-            for (final char ch : CHAR_SAMPLES) {
+            for (final char ch : ALL_CHARS) {
                 final boolean b = CharUtils.isAsciiNumeric(ch);
                 t += b ? 1 : 0;
             }
@@ -141,16 +144,11 @@ public class CharUtilsPerfRun {
     private int run_inlined_CharUtils_isAsciiNumeric(final int loopCount) {
         int t = 0;
         for (int i = 0; i < loopCount; i++) {
-            for (final char ch : CHAR_SAMPLES) {
+            for (final char ch : ALL_CHARS) {
                 final boolean b = ch >= '0' && ch <= '9';
                 t += b ? 1 : 0;
             }
         }
         return t;
-    }
-
-    private void printlnTotal(final String prefix, final long start) {
-        final long total = System.currentTimeMillis() - start;
-        System.out.println(prefix + ": " + NumberFormat.getInstance().format(total) + " milliseconds.");
     }
 }

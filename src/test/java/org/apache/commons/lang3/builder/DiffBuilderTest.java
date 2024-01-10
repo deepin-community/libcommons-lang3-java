@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.apache.commons.lang3.AbstractLangTest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
@@ -33,9 +34,9 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests {@link DiffBuilder}.
  */
-public class DiffBuilderTest {
+public class DiffBuilderTest extends AbstractLangTest {
 
-    private static class TypeTestClass implements Diffable<TypeTestClass> {
+    private static final class TypeTestClass implements Diffable<TypeTestClass> {
         private ToStringStyle style = SHORT_STYLE;
         private boolean booleanField = true;
         private boolean[] booleanArrayField = {true};
@@ -53,7 +54,7 @@ public class DiffBuilderTest {
         private long[] longArrayField = {1L};
         private short shortField = 1;
         private short[] shortArrayField = {1};
-        private Object objectField = null;
+        private Object objectField;
         private Object[] objectArrayField = {null};
 
         @Override
@@ -312,8 +313,18 @@ public class DiffBuilderTest {
     }
 
     @Test
+    public void testNullLhs_4args() {
+        assertThrows(NullPointerException.class, () -> new DiffBuilder<>(null, this, ToStringStyle.DEFAULT_STYLE, true));
+    }
+
+    @Test
     public void testNullRhs() {
         assertThrows(NullPointerException.class, () -> new DiffBuilder<>(this, null, ToStringStyle.DEFAULT_STYLE));
+    }
+
+    @Test
+    public void testNullRhs_4args() {
+        assertThrows(NullPointerException.class, () -> new DiffBuilder<>(this, null, ToStringStyle.DEFAULT_STYLE, true));
     }
 
     @Test
@@ -356,9 +367,9 @@ public class DiffBuilderTest {
     @Test
     public void testObjectsNotSameButEqual() {
         final TypeTestClass left = new TypeTestClass();
-        left.objectField = new Integer(1);
+        left.objectField = Integer.valueOf(1000);
         final TypeTestClass right = new TypeTestClass();
-        right.objectField = new Integer(1);
+        right.objectField = Integer.valueOf(1000);
         assertNotSame(left.objectField, right.objectField);
         assertEquals(left.objectField, right.objectField);
 
