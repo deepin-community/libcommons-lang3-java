@@ -16,92 +16,50 @@
  */
 package org.apache.commons.lang3.concurrent.locks;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.LongConsumer;
 
+import org.apache.commons.lang3.AbstractLangTest;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ThreadUtils;
 import org.apache.commons.lang3.concurrent.locks.LockingVisitors.LockVisitor;
 import org.apache.commons.lang3.concurrent.locks.LockingVisitors.StampedLockVisitor;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.junit.jupiter.api.Test;
 
-public class LockingVisitorsTest {
+public class LockingVisitorsTest extends AbstractLangTest {
+
+    private static final Duration SHORT_DELAY = Duration.ofMillis(100);
+    private static final Duration DELAY = Duration.ofMillis(1500);
     private static final int NUMBER_OF_THREADS = 10;
-    private static final long DELAY_MILLIS = 3000;
-    private static final long TOTAL_DELAY_MILLIS = NUMBER_OF_THREADS * DELAY_MILLIS;
+    private static final Duration TOTAL_DELAY = DELAY.multipliedBy(NUMBER_OF_THREADS);
 
-    @Test
-    public void testStampedLockNotExclusive() throws Exception {
-
-        /*
-         * If our threads are running concurrently, then we expect to be faster than running one after the other.
-         */
-        boolean[] booleanValues = new boolean[10];
-        runTest(DELAY_MILLIS, false, l -> assertTrue(l < TOTAL_DELAY_MILLIS), booleanValues,
-            LockingVisitors.stampedLockVisitor(booleanValues));
+    protected boolean containsTrue(final boolean[] booleanArray) {
+        synchronized (booleanArray) {
+            return ArrayUtils.contains(booleanArray, true);
+        }
     }
 
-    @Test
-    public void testReentrantReadWriteLockNotExclusive() throws Exception {
-
-        /*
-         * If our threads are running concurrently, then we expect to be faster than running one after the other.
-         */
-        boolean[] booleanValues = new boolean[10];
-        runTest(DELAY_MILLIS, false, l -> assertTrue(l < TOTAL_DELAY_MILLIS), booleanValues,
-            LockingVisitors.reentrantReadWriteLockVisitor(booleanValues));
-    }
-
-    @Test
-    public void testStampedLockExclusive() throws Exception {
-
-        /*
-         * If our threads are running concurrently, then we expect to be no faster than running one after the other.
-         */
-        boolean[] booleanValues = new boolean[10];
-        runTest(DELAY_MILLIS, true, l -> assertTrue(l >= TOTAL_DELAY_MILLIS), booleanValues,
-            LockingVisitors.stampedLockVisitor(booleanValues));
-    }
-
-    @Test
-    public void testReentrantReadWriteLockExclusive() throws Exception {
-
-        /*
-         * If our threads are running concurrently, then we expect to be no faster than running one after the other.
-         */
-        boolean[] booleanValues = new boolean[10];
-        runTest(DELAY_MILLIS, true, l -> assertTrue(l >= TOTAL_DELAY_MILLIS), booleanValues,
-            LockingVisitors.reentrantReadWriteLockVisitor(booleanValues));
-    }
-
-    @Test
-    public void testResultValidation() {
-        final Object hidden = new Object();
-        final StampedLockVisitor<Object> lock = LockingVisitors.stampedLockVisitor(hidden);
-        final Object o1 = lock.applyReadLocked(h -> {
-            return new Object(); });
-        assertNotNull(o1);
-        assertNotSame(hidden, o1);
-        final Object o2 = lock.applyWriteLocked(h -> {
-            return new Object(); });
-        assertNotNull(o2);
-        assertNotSame(hidden, o2);
-    }
-
-    private void runTest(final long delayMillis, final boolean exclusiveLock, final LongConsumer runTimeCheck,
-        boolean[] booleanValues, LockVisitor<boolean[], ?> visitor) throws InterruptedException {
+    private void runTest(final Duration delay, final boolean exclusiveLock, final LongConsumer runTimeCheck,
+        final boolean[] booleanValues, final LockVisitor<boolean[], ?> visitor) throws InterruptedException {
         final boolean[] runningValues = new boolean[10];
 
-        final long startTime = System.currentTimeMillis();
+        final long startTimeMillis = System.currentTimeMillis();
         for (int i = 0; i < booleanValues.length; i++) {
             final int index = i;
             final FailableConsumer<boolean[], ?> consumer = b -> {
                 b[index] = false;
-                Thread.sleep(delayMillis);
+                ThreadUtils.sleep(delay);
                 b[index] = true;
-                modify(runningValues, index, false);
+                set(runningValues, index, false);
             };
             final Thread t = new Thread(() -> {
                 if (exclusiveLock) {
@@ -110,34 +68,89 @@ public class LockingVisitorsTest {
                     visitor.acceptReadLocked(consumer);
                 }
             });
-            modify(runningValues, i, true);
+            set(runningValues, i, true);
             t.start();
         }
-        while (someValueIsTrue(runningValues)) {
-            Thread.sleep(100);
+        while (containsTrue(runningValues)) {
+            ThreadUtils.sleep(SHORT_DELAY);
         }
-        final long endTime = System.currentTimeMillis();
-        for (int i = 0; i < booleanValues.length; i++) {
-            assertTrue(booleanValues[i]);
+        final long endTimeMillis = System.currentTimeMillis();
+        for (final boolean booleanValue : booleanValues) {
+            assertTrue(booleanValue);
         }
         // WRONG assumption
-        // runTimeCheck.accept(endTime - startTime);
+        // runTimeCheck.accept(endTimeMillis - startTimeMillis);
     }
 
-    protected void modify(final boolean[] booleanArray, final int offset, final boolean value) {
+    protected void set(final boolean[] booleanArray, final int offset, final boolean value) {
         synchronized (booleanArray) {
             booleanArray[offset] = value;
         }
     }
 
-    protected boolean someValueIsTrue(final boolean[] booleanArray) {
-        synchronized (booleanArray) {
-            for (int i = 0; i < booleanArray.length; i++) {
-                if (booleanArray[i]) {
-                    return true;
-                }
-            }
-            return false;
-        }
+    @Test
+    public void testCreate() {
+        final AtomicInteger res = new AtomicInteger();
+        final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+        LockingVisitors.create(res, rwLock).acceptReadLocked(AtomicInteger::incrementAndGet);
+        assertEquals(1, res.get());
+        LockingVisitors.create(res, rwLock).acceptWriteLocked(AtomicInteger::incrementAndGet);
+        assertEquals(2, res.get());
+    }
+
+    @Test
+    public void testReentrantReadWriteLockExclusive() throws Exception {
+
+        /*
+         * If our threads are running concurrently, then we expect to be no faster than running one after the other.
+         */
+        final boolean[] booleanValues = new boolean[10];
+        runTest(DELAY, true, millis -> assertTrue(millis >= TOTAL_DELAY.toMillis()), booleanValues,
+            LockingVisitors.reentrantReadWriteLockVisitor(booleanValues));
+    }
+
+    @Test
+    public void testReentrantReadWriteLockNotExclusive() throws Exception {
+
+        /*
+         * If our threads are running concurrently, then we expect to be faster than running one after the other.
+         */
+        final boolean[] booleanValues = new boolean[10];
+        runTest(DELAY, false, millis -> assertTrue(millis < TOTAL_DELAY.toMillis()), booleanValues,
+            LockingVisitors.reentrantReadWriteLockVisitor(booleanValues));
+    }
+
+    @Test
+    public void testResultValidation() {
+        final Object hidden = new Object();
+        final StampedLockVisitor<Object> lock = LockingVisitors.stampedLockVisitor(hidden);
+        final Object o1 = lock.applyReadLocked(h -> new Object());
+        assertNotNull(o1);
+        assertNotSame(hidden, o1);
+        final Object o2 = lock.applyWriteLocked(h -> new Object());
+        assertNotNull(o2);
+        assertNotSame(hidden, o2);
+    }
+
+    @Test
+    public void testStampedLockExclusive() throws Exception {
+
+        /*
+         * If our threads are running concurrently, then we expect to be no faster than running one after the other.
+         */
+        final boolean[] booleanValues = new boolean[10];
+        runTest(DELAY, true, millis -> assertTrue(millis >= TOTAL_DELAY.toMillis()), booleanValues,
+            LockingVisitors.stampedLockVisitor(booleanValues));
+    }
+
+    @Test
+    public void testStampedLockNotExclusive() throws Exception {
+
+        /*
+         * If our threads are running concurrently, then we expect to be faster than running one after the other.
+         */
+        final boolean[] booleanValues = new boolean[10];
+        runTest(DELAY, false, millis -> assertTrue(millis < TOTAL_DELAY.toMillis()), booleanValues,
+            LockingVisitors.stampedLockVisitor(booleanValues));
     }
 }

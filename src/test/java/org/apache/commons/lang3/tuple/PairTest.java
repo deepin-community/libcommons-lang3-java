@@ -19,31 +19,51 @@ package org.apache.commons.lang3.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.AbstractLangTest;
 import org.junit.jupiter.api.Test;
 
 /**
  * Test the Pair class.
  */
-public class PairTest {
+public class PairTest extends AbstractLangTest {
 
     @Test
-    public void testEmptyArrayLength() {
-        @SuppressWarnings("unchecked")
-        final Pair<Integer, String>[] empty = (Pair<Integer, String>[]) Pair.EMPTY_ARRAY;
-        assertEquals(0, empty.length);
+    public void testAccept() {
+        final Pair<String, String> pair1 = Pair.of("A", "D");
+        final Pair<String, String> pair2 = Pair.of("B", "C");
+        final Map<String, String> map = new HashMap<>();
+        pair1.accept(map::put);
+        pair2.accept(map::put);
+        assertEquals("D", map.get("A"));
+        assertEquals("C", map.get("B"));
+        pair1.accept(map::put);
+        pair2.accept(map::put);
+        assertEquals("D", map.get("A"));
+        assertEquals("C", map.get("B"));
     }
 
     @Test
-    public void testEmptyArrayGenerics() {
-        final Pair<Integer, String>[] empty = Pair.emptyArray();
-        assertEquals(0, empty.length);
+    public void testApply() {
+        final Pair<String, String> pair1 = Pair.of("A", "D");
+        final Pair<String, String> pair2 = Pair.of("B", "C");
+        final Map<String, String> map = new HashMap<>();
+        assertEquals(null, pair1.apply(map::put));
+        assertEquals(null, pair2.apply(map::put));
+        assertEquals("D", map.get("A"));
+        assertEquals("C", map.get("B"));
+        assertEquals("D", pair1.apply(map::put));
+        assertEquals("C", pair2.apply(map::put));
+        assertEquals("D", map.get("A"));
+        assertEquals("C", map.get("B"));
     }
 
     @Test
@@ -82,6 +102,19 @@ public class PairTest {
     }
 
     @Test
+    public void testEmptyArrayGenerics() {
+        final Pair<Integer, String>[] empty = Pair.emptyArray();
+        assertEquals(0, empty.length);
+    }
+
+    @Test
+    public void testEmptyArrayLength() {
+        @SuppressWarnings("unchecked")
+        final Pair<Integer, String>[] empty = (Pair<Integer, String>[]) Pair.EMPTY_ARRAY;
+        assertEquals(0, empty.length);
+    }
+
+    @Test
     public void testFormattable_padded() {
         final Pair<String, String> pair = Pair.of("Key", "Value");
         assertEquals("         (Key,Value)", String.format("%1$20s", pair));
@@ -104,6 +137,16 @@ public class PairTest {
     }
 
     @Test
+    public void testOfNonNull() {
+        assertThrows(NullPointerException.class, () -> Pair.ofNonNull(null, null));
+        assertThrows(NullPointerException.class, () -> Pair.ofNonNull(null, "x"));
+        assertThrows(NullPointerException.class, () -> Pair.ofNonNull("x", null));
+        final Pair<String, String> pair = Pair.ofNonNull("x", "y");
+        assertEquals("x", pair.getLeft());
+        assertEquals("y", pair.getRight());
+    }
+
+    @Test
     public void testPairOfMapEntry() {
         final HashMap<Integer, String> map = new HashMap<>();
         map.put(0, "foo");
@@ -123,7 +166,7 @@ public class PairTest {
         assertTrue(pair2 instanceof ImmutablePair<?, ?>);
         assertNull(((ImmutablePair<Object, String>) pair2).left);
         assertEquals("bar", ((ImmutablePair<Object, String>) pair2).right);
-        final Pair pair3 = Pair.of(null, null);
+        final Pair<?, ?> pair3 = Pair.of(null, null);
         assertNull(pair3.getLeft());
         assertNull(pair3.getRight());
     }

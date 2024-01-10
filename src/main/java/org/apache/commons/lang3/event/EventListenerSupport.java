@@ -22,23 +22,24 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
 
 /**
- * <p>An EventListenerSupport object can be used to manage a list of event
+ * An EventListenerSupport object can be used to manage a list of event
  * listeners of a particular type. The class provides
  * {@link #addListener(Object)} and {@link #removeListener(Object)} methods
  * for registering listeners, as well as a {@link #fire()} method for firing
  * events to the listeners.
- * </p>
  *
  * <p>
  * To use this class, suppose you want to support ActionEvents.  You would do:
@@ -68,26 +69,34 @@ import org.apache.commons.lang3.Validate;
  */
 public class EventListenerSupport<L> implements Serializable {
 
+    /**
+     * An invocation handler used to dispatch the event(s) to all the listeners.
+     */
+    protected class ProxyInvocationHandler implements InvocationHandler {
+
+        /**
+         * Propagates the method call to all registered listeners in place of the proxy listener object.
+         *
+         * @param unusedProxy the proxy object representing a listener on which the invocation was called; not used
+         * @param method the listener method that will be called on all of the listeners.
+         * @param args event arguments to propagate to the listeners.
+         * @return the result of the method call
+         * @throws InvocationTargetException if an error occurs
+         * @throws IllegalArgumentException if an error occurs
+         * @throws IllegalAccessException if an error occurs
+         */
+        @Override
+        public Object invoke(final Object unusedProxy, final Method method, final Object[] args)
+                throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+            for (final L listener : listeners) {
+                method.invoke(listener, args);
+            }
+            return null;
+        }
+    }
+
     /** Serialization version */
     private static final long serialVersionUID = 3593265990380473632L;
-
-    /**
-     * The list used to hold the registered listeners. This list is
-     * intentionally a thread-safe copy-on-write-array so that traversals over
-     * the list of listeners will be atomic.
-     */
-    private List<L> listeners = new CopyOnWriteArrayList<>();
-
-    /**
-     * The proxy representing the collection of listeners. Calls to this proxy
-     * object will sent to all registered listeners.
-     */
-    private transient L proxy;
-
-    /**
-     * Empty typed array for #getListeners().
-     */
-    private transient L[] prototypeArray;
 
     /**
      * Creates an EventListenerSupport object which supports the specified
@@ -107,6 +116,31 @@ public class EventListenerSupport<L> implements Serializable {
      */
     public static <T> EventListenerSupport<T> create(final Class<T> listenerInterface) {
         return new EventListenerSupport<>(listenerInterface);
+    }
+
+    /**
+     * The list used to hold the registered listeners. This list is
+     * intentionally a thread-safe copy-on-write-array so that traversals over
+     * the list of listeners will be atomic.
+     */
+    private List<L> listeners = new CopyOnWriteArrayList<>();
+
+    /**
+     * The proxy representing the collection of listeners. Calls to this proxy
+     * object will be sent to all registered listeners.
+     */
+    private transient L proxy;
+
+    /**
+     * Empty typed array for #getListeners().
+     */
+    private transient L[] prototypeArray;
+
+    /**
+     * Create a new EventListenerSupport instance.
+     * Serialization-friendly constructor.
+     */
+    private EventListenerSupport() {
     }
 
     /**
@@ -140,30 +174,11 @@ public class EventListenerSupport<L> implements Serializable {
      */
     public EventListenerSupport(final Class<L> listenerInterface, final ClassLoader classLoader) {
         this();
-        Validate.notNull(listenerInterface, "Listener interface cannot be null.");
-        Validate.notNull(classLoader, "ClassLoader cannot be null.");
+        Objects.requireNonNull(listenerInterface, "listenerInterface");
+        Objects.requireNonNull(classLoader, "classLoader");
         Validate.isTrue(listenerInterface.isInterface(), "Class %s is not an interface",
                 listenerInterface.getName());
         initializeTransientFields(listenerInterface, classLoader);
-    }
-
-    /**
-     * Create a new EventListenerSupport instance.
-     * Serialization-friendly constructor.
-     */
-    private EventListenerSupport() {
-    }
-
-    /**
-     * Returns a proxy object which can be used to call listener methods on all
-     * of the registered event listeners. All calls made to this proxy will be
-     * forwarded to all registered listeners.
-     *
-     * @return a proxy object which can be used to call listener methods on all
-     * of the registered event listeners
-     */
-    public L fire() {
-        return proxy;
     }
 
 //**********************************************************************************************************************
@@ -194,10 +209,41 @@ public class EventListenerSupport<L> implements Serializable {
      * @since 3.5
      */
     public void addListener(final L listener, final boolean allowDuplicate) {
-        Validate.notNull(listener, "Listener object cannot be null.");
+        Objects.requireNonNull(listener, "listener");
         if (allowDuplicate || !listeners.contains(listener)) {
             listeners.add(listener);
         }
+    }
+
+    /**
+     * Create the {@link InvocationHandler} responsible for broadcasting calls
+     * to the managed listeners.  Subclasses can override to provide custom behavior.
+     * @return ProxyInvocationHandler
+     */
+    protected InvocationHandler createInvocationHandler() {
+        return new ProxyInvocationHandler();
+    }
+
+    /**
+     * Create the proxy object.
+     * @param listenerInterface the class of the listener interface
+     * @param classLoader the class loader to be used
+     */
+    private void createProxy(final Class<L> listenerInterface, final ClassLoader classLoader) {
+        proxy = listenerInterface.cast(Proxy.newProxyInstance(classLoader,
+                new Class[] { listenerInterface }, createInvocationHandler()));
+    }
+
+    /**
+     * Returns a proxy object which can be used to call listener methods on all
+     * of the registered event listeners. All calls made to this proxy will be
+     * forwarded to all registered listeners.
+     *
+     * @return a proxy object which can be used to call listener methods on all
+     * of the registered event listeners
+     */
+    public L fire() {
+        return proxy;
     }
 
     /**
@@ -210,6 +256,44 @@ public class EventListenerSupport<L> implements Serializable {
     }
 
     /**
+     * Gets an array containing the currently registered listeners.
+     * Modification to this array's elements will have no effect on the
+     * {@link EventListenerSupport} instance.
+     * @return L[]
+     */
+    public L[] getListeners() {
+        return listeners.toArray(prototypeArray);
+    }
+
+    /**
+     * Initialize transient fields.
+     * @param listenerInterface the class of the listener interface
+     * @param classLoader the class loader to be used
+     */
+    private void initializeTransientFields(final Class<L> listenerInterface, final ClassLoader classLoader) {
+        // Will throw CCE here if not correct
+        this.prototypeArray = ArrayUtils.newInstance(listenerInterface, 0);
+        createProxy(listenerInterface, classLoader);
+    }
+
+    /**
+     * Deserialize.
+     * @param objectInputStream the input stream
+     * @throws IOException if an IO error occurs
+     * @throws ClassNotFoundException if the class cannot be resolved
+     */
+    private void readObject(final ObjectInputStream objectInputStream) throws IOException, ClassNotFoundException {
+        @SuppressWarnings("unchecked") // Will throw CCE here if not correct
+        final L[] srcListeners = (L[]) objectInputStream.readObject();
+
+        this.listeners = new CopyOnWriteArrayList<>(srcListeners);
+
+        final Class<L> listenerInterface = ArrayUtils.getComponentType(srcListeners);
+
+        initializeTransientFields(listenerInterface, Thread.currentThread().getContextClassLoader());
+    }
+
+    /**
      * Unregisters an event listener.
      *
      * @param listener the event listener (may not be {@code null}).
@@ -218,18 +302,8 @@ public class EventListenerSupport<L> implements Serializable {
      *         {@code null}.
      */
     public void removeListener(final L listener) {
-        Validate.notNull(listener, "Listener object cannot be null.");
+        Objects.requireNonNull(listener, "listener");
         listeners.remove(listener);
-    }
-
-    /**
-     * Gets an array containing the currently registered listeners.
-     * Modification to this array's elements will have no effect on the
-     * {@link EventListenerSupport} instance.
-     * @return L[]
-     */
-    public L[] getListeners() {
-        return listeners.toArray(prototypeArray);
     }
 
     /**
@@ -256,83 +330,5 @@ public class EventListenerSupport<L> implements Serializable {
          * which has the additional advantage of typically requiring less storage than a list:
          */
         objectOutputStream.writeObject(serializableListeners.toArray(prototypeArray));
-    }
-
-    /**
-     * Deserialize.
-     * @param objectInputStream the input stream
-     * @throws IOException if an IO error occurs
-     * @throws ClassNotFoundException if the class cannot be resolved
-     */
-    private void readObject(final ObjectInputStream objectInputStream) throws IOException, ClassNotFoundException {
-        @SuppressWarnings("unchecked") // Will throw CCE here if not correct
-        final
-        L[] srcListeners = (L[]) objectInputStream.readObject();
-
-        this.listeners = new CopyOnWriteArrayList<>(srcListeners);
-
-        @SuppressWarnings("unchecked") // Will throw CCE here if not correct
-        final
-        Class<L> listenerInterface = (Class<L>) srcListeners.getClass().getComponentType();
-
-        initializeTransientFields(listenerInterface, Thread.currentThread().getContextClassLoader());
-    }
-
-    /**
-     * Initialize transient fields.
-     * @param listenerInterface the class of the listener interface
-     * @param classLoader the class loader to be used
-     */
-    private void initializeTransientFields(final Class<L> listenerInterface, final ClassLoader classLoader) {
-        @SuppressWarnings("unchecked") // Will throw CCE here if not correct
-        final
-        L[] array = (L[]) Array.newInstance(listenerInterface, 0);
-        this.prototypeArray = array;
-        createProxy(listenerInterface, classLoader);
-    }
-
-    /**
-     * Create the proxy object.
-     * @param listenerInterface the class of the listener interface
-     * @param classLoader the class loader to be used
-     */
-    private void createProxy(final Class<L> listenerInterface, final ClassLoader classLoader) {
-        proxy = listenerInterface.cast(Proxy.newProxyInstance(classLoader,
-                new Class[] { listenerInterface }, createInvocationHandler()));
-    }
-
-    /**
-     * Create the {@link InvocationHandler} responsible for broadcasting calls
-     * to the managed listeners.  Subclasses can override to provide custom behavior.
-     * @return ProxyInvocationHandler
-     */
-    protected InvocationHandler createInvocationHandler() {
-        return new ProxyInvocationHandler();
-    }
-
-    /**
-     * An invocation handler used to dispatch the event(s) to all the listeners.
-     */
-    protected class ProxyInvocationHandler implements InvocationHandler {
-
-        /**
-         * Propagates the method call to all registered listeners in place of
-         * the proxy listener object.
-         *
-         * @param unusedProxy the proxy object representing a listener on which the
-         *        invocation was called; not used
-         * @param method the listener method that will be called on all of the
-         *        listeners.
-         * @param args event arguments to propagate to the listeners.
-         * @return the result of the method call
-         * @throws Throwable if an error occurs
-         */
-        @Override
-        public Object invoke(final Object unusedProxy, final Method method, final Object[] args) throws Throwable {
-            for (final L listener : listeners) {
-                method.invoke(listener, args);
-            }
-            return null;
-        }
     }
 }

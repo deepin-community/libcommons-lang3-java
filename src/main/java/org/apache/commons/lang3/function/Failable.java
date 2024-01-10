@@ -32,6 +32,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.stream.Streams;
 import org.apache.commons.lang3.stream.Streams.FailableStream;
 
 /**
@@ -41,7 +43,7 @@ import org.apache.commons.lang3.stream.Streams.FailableStream;
  * constructs like:
  *
  * <pre>
- * Consumer&lt;java.lang.reflect.Method-&gt; consumer = (m) -&gt; {
+ * Consumer&lt;java.lang.reflect.Method&gt; consumer = m -&gt; {
  *     try {
  *         m.invoke(o, args);
  *     } catch (Throwable t) {
@@ -178,8 +180,8 @@ public class Failable {
      *
      * @param <T> the type of the first argument of the consumers
      * @param <U> the type of the second argument of the consumers
-     * @param consumer a failable {@code BiConsumer}
-     * @return a standard {@code BiConsumer}
+     * @param consumer a failable {@link BiConsumer}
+     * @return a standard {@link BiConsumer}
      */
     public static <T, U> BiConsumer<T, U> asBiConsumer(final FailableBiConsumer<T, U, ?> consumer) {
         return (input1, input2) -> accept(consumer, input1, input2);
@@ -191,8 +193,8 @@ public class Failable {
      * @param <T> the type of the first argument of the input of the functions
      * @param <U> the type of the second argument of the input of the functions
      * @param <R> the type of the output of the functions
-     * @param function a {@code FailableBiFunction}
-     * @return a standard {@code BiFunction}
+     * @param function a {@link FailableBiFunction}
+     * @return a standard {@link BiFunction}
      */
     public static <T, U, R> BiFunction<T, U, R> asBiFunction(final FailableBiFunction<T, U, R, ?> function) {
         return (input1, input2) -> apply(function, input1, input2);
@@ -203,8 +205,8 @@ public class Failable {
      *
      * @param <T> the type of the first argument used by the predicates
      * @param <U> the type of the second argument used by the predicates
-     * @param predicate a {@code FailableBiPredicate}
-     * @return a standard {@code BiPredicate}
+     * @param predicate a {@link FailableBiPredicate}
+     * @return a standard {@link BiPredicate}
      */
     public static <T, U> BiPredicate<T, U> asBiPredicate(final FailableBiPredicate<T, U, ?> predicate) {
         return (input1, input2) -> test(predicate, input1, input2);
@@ -214,8 +216,8 @@ public class Failable {
      * Converts the given {@link FailableCallable} into a standard {@link Callable}.
      *
      * @param <V> the type used by the callables
-     * @param callable a {@code FailableCallable}
-     * @return a standard {@code Callable}
+     * @param callable a {@link FailableCallable}
+     * @return a standard {@link Callable}
      */
     public static <V> Callable<V> asCallable(final FailableCallable<V, ?> callable) {
         return () -> call(callable);
@@ -225,8 +227,8 @@ public class Failable {
      * Converts the given {@link FailableConsumer} into a standard {@link Consumer}.
      *
      * @param <T> the type used by the consumers
-     * @param consumer a {@code FailableConsumer}
-     * @return a standard {@code Consumer}
+     * @param consumer a {@link FailableConsumer}
+     * @return a standard {@link Consumer}
      */
     public static <T> Consumer<T> asConsumer(final FailableConsumer<T, ?> consumer) {
         return input -> accept(consumer, input);
@@ -238,7 +240,7 @@ public class Failable {
      * @param <T> the type of the input of the functions
      * @param <R> the type of the output of the functions
      * @param function a {code FailableFunction}
-     * @return a standard {@code Function}
+     * @return a standard {@link Function}
      */
     public static <T, R> Function<T, R> asFunction(final FailableFunction<T, R, ?> function) {
         return input -> apply(function, input);
@@ -248,8 +250,8 @@ public class Failable {
      * Converts the given {@link FailablePredicate} into a standard {@link Predicate}.
      *
      * @param <T> the type used by the predicates
-     * @param predicate a {@code FailablePredicate}
-     * @return a standard {@code Predicate}
+     * @param predicate a {@link FailablePredicate}
+     * @return a standard {@link Predicate}
      */
     public static <T> Predicate<T> asPredicate(final FailablePredicate<T, ?> predicate) {
         return input -> test(predicate, input);
@@ -258,8 +260,8 @@ public class Failable {
     /**
      * Converts the given {@link FailableRunnable} into a standard {@link Runnable}.
      *
-     * @param runnable a {@code FailableRunnable}
-     * @return a standard {@code Runnable}
+     * @param runnable a {@link FailableRunnable}
+     * @return a standard {@link Runnable}
      */
     public static Runnable asRunnable(final FailableRunnable<?> runnable) {
         return () -> run(runnable);
@@ -269,8 +271,8 @@ public class Failable {
      * Converts the given {@link FailableSupplier} into a standard {@link Supplier}.
      *
      * @param <T> the type supplied by the suppliers
-     * @param supplier a {@code FailableSupplier}
-     * @return a standard {@code Supplier}
+     * @param supplier a {@link FailableSupplier}
+     * @return a standard {@link Supplier}
      */
     public static <T> Supplier<T> asSupplier(final FailableSupplier<T, ?> supplier) {
         return () -> get(supplier);
@@ -324,7 +326,7 @@ public class Failable {
      *
      * @param supplier The double supplier to invoke.
      * @param <E> The type of checked exception, which the supplier can throw.
-     * @return The boolean, which has been created by the supplier
+     * @return The double, which has been created by the supplier
      */
     public static <E extends Throwable> double getAsDouble(final FailableDoubleSupplier<E> supplier) {
         try {
@@ -339,7 +341,7 @@ public class Failable {
      *
      * @param supplier The int supplier to invoke.
      * @param <E> The type of checked exception, which the supplier can throw.
-     * @return The boolean, which has been created by the supplier
+     * @return The int, which has been created by the supplier
      */
     public static <E extends Throwable> int getAsInt(final FailableIntSupplier<E> supplier) {
         try {
@@ -354,7 +356,7 @@ public class Failable {
      *
      * @param supplier The long supplier to invoke.
      * @param <E> The type of checked exception, which the supplier can throw.
-     * @return The boolean, which has been created by the supplier
+     * @return The long, which has been created by the supplier
      */
     public static <E extends Throwable> long getAsLong(final FailableLongSupplier<E> supplier) {
         try {
@@ -365,13 +367,26 @@ public class Failable {
     }
 
     /**
-     * <p>
+     * Invokes a short supplier, and returns the result.
+     *
+     * @param supplier The short supplier to invoke.
+     * @param <E> The type of checked exception, which the supplier can throw.
+     * @return The short, which has been created by the supplier
+     */
+    public static <E extends Throwable> short getAsShort(final FailableShortSupplier<E> supplier) {
+        try {
+            return supplier.getAsShort();
+        } catch (final Throwable t) {
+            throw rethrow(t);
+        }
+    }
+
+    /**
      * Rethrows a {@link Throwable} as an unchecked exception. If the argument is already unchecked, namely a
-     * {@code RuntimeException} or {@code Error} then the argument will be rethrown without modification. If the
-     * exception is {@code IOException} then it will be wrapped into a {@code UncheckedIOException}. In every other
+     * {@link RuntimeException} or {@link Error} then the argument will be rethrown without modification. If the
+     * exception is {@link IOException} then it will be wrapped into a {@link UncheckedIOException}. In every other
      * cases the exception will be wrapped into a {@code
      * UndeclaredThrowableException}
-     * </p>
      *
      * <p>
      * Note that there is a declared return type for this method, even though it never returns. The reason for that is
@@ -388,20 +403,16 @@ public class Failable {
      * follow the method call, like a {@code return} statement from a value returning method.
      * </p>
      *
-     * @param throwable The throwable to rethrow ossibly wrapped into an unchecked exception
+     * @param throwable The throwable to rethrow possibly wrapped into an unchecked exception
      * @return Never returns anything, this method never terminates normally.
      */
     public static RuntimeException rethrow(final Throwable throwable) {
         Objects.requireNonNull(throwable, "throwable");
-        if (throwable instanceof RuntimeException) {
-            throw (RuntimeException) throwable;
-        } else if (throwable instanceof Error) {
-            throw (Error) throwable;
-        } else if (throwable instanceof IOException) {
+        ExceptionUtils.throwUnchecked(throwable);
+        if (throwable instanceof IOException) {
             throw new UncheckedIOException((IOException) throwable);
-        } else {
-            throw new UndeclaredThrowableException(throwable);
         }
+        throw new UndeclaredThrowableException(throwable);
     }
 
     /**
@@ -482,7 +493,7 @@ public class Failable {
      * {@link AutoCloseable} interface. The method executes the {@code action}. The method guarantees, that <em>all</em>
      * the {@code resources} are being executed, in the given order, afterwards, and regardless of success, or failure.
      * If either the original action, or any of the resource action fails, then the <em>first</em> failure (AKA
-     * {@link Throwable} is rethrown. Example use:
+     * {@link Throwable}) is rethrown. Example use:
      *
      * <pre>
      * final FileInputStream fis = new FileInputStream("my.file");
@@ -506,11 +517,7 @@ public class Failable {
         } else {
             actualErrorHandler = errorHandler;
         }
-        if (resources != null) {
-            for (final FailableRunnable<? extends Throwable> failableRunnable : resources) {
-                Objects.requireNonNull(failableRunnable, "runnable");
-            }
-        }
+        Streams.of(resources).forEach(r -> Objects.requireNonNull(r, "runnable"));
         Throwable th = null;
         try {
             action.run();
@@ -542,7 +549,7 @@ public class Failable {
      * {@link AutoCloseable} interface. The method executes the {@code action}. The method guarantees, that <em>all</em>
      * the {@code resources} are being executed, in the given order, afterwards, and regardless of success, or failure.
      * If either the original action, or any of the resource action fails, then the <em>first</em> failure (AKA
-     * {@link Throwable} is rethrown. Example use:
+     * {@link Throwable}) is rethrown. Example use:
      *
      * <pre>
      * final FileInputStream fis = new FileInputStream("my.file");

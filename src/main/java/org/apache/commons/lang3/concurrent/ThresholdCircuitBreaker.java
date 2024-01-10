@@ -19,11 +19,9 @@ package org.apache.commons.lang3.concurrent;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * <p>
  * A simple implementation of the <a
- * href="http://martinfowler.com/bliki/CircuitBreaker.html">Circuit Breaker</a> pattern
+ * href="https://martinfowler.com/bliki/CircuitBreaker.html">Circuit Breaker</a> pattern
  * that opens if the requested increment amount is greater than a given threshold.
- * </p>
  *
  * <p>
  * It contains an internal counter that starts in zero, and each call increments the counter by a given amount.
@@ -68,23 +66,13 @@ public class ThresholdCircuitBreaker extends AbstractCircuitBreaker<Long> {
     private final AtomicLong used;
 
     /**
-     * <p>Creates a new instance of {@code ThresholdCircuitBreaker} and initializes the threshold.</p>
+     * Creates a new instance of {@link ThresholdCircuitBreaker} and initializes the threshold.
      *
      * @param threshold the threshold.
      */
     public ThresholdCircuitBreaker(final long threshold) {
-        super();
         this.used = new AtomicLong(INITIAL_COUNT);
         this.threshold = threshold;
-    }
-
-    /**
-     * Gets the threshold.
-     *
-     * @return the threshold
-     */
-    public long getThreshold() {
-        return threshold;
     }
 
     /**
@@ -92,7 +80,7 @@ public class ThresholdCircuitBreaker extends AbstractCircuitBreaker<Long> {
      */
     @Override
     public boolean checkState() {
-        return isOpen();
+        return !isOpen();
     }
 
     /**
@@ -104,6 +92,15 @@ public class ThresholdCircuitBreaker extends AbstractCircuitBreaker<Long> {
     public void close() {
         super.close();
         this.used.set(INITIAL_COUNT);
+    }
+
+    /**
+     * Gets the threshold.
+     *
+     * @return the threshold
+     */
+    public long getThreshold() {
+        return threshold;
     }
 
     /**

@@ -21,37 +21,23 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.AbstractLangTest;
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * Test the Pair class.
  */
-public class ImmutablePairTest {
-
-    @Test
-    public void testEmptyArrayLength() {
-        @SuppressWarnings("unchecked")
-        final ImmutablePair<Integer, String>[] empty = (ImmutablePair<Integer, String>[]) ImmutablePair.EMPTY_ARRAY;
-        assertEquals(0, empty.length);
-    }
-
-    @Test
-    public void testEmptyArrayGenerics() {
-        final ImmutablePair<Integer, String>[] empty = ImmutablePair.emptyArray();
-        assertEquals(0, empty.length);
-    }
+public class ImmutablePairTest extends AbstractLangTest {
 
     @Test
     public void testBasic() {
@@ -77,6 +63,43 @@ public class ImmutablePairTest {
             assertEquals("bar", nowPair2.getRight());
             oldPair2 = nowPair2;
         }
+    }
+
+    @Test
+    public void testComparableLeftOnly() {
+        final Pair<String, String> pair1 = ImmutablePair.left("A");
+        final Pair<String, String> pair2 = ImmutablePair.left("B");
+        assertEquals("A", pair1.getLeft());
+        assertEquals("B", pair2.getLeft());
+        assertEquals(0, pair1.compareTo(pair1));
+        assertTrue(pair1.compareTo(pair2) < 0);
+        assertEquals(0, pair2.compareTo(pair2));
+        assertTrue(pair2.compareTo(pair1) > 0);
+    }
+
+    @Test
+    public void testComparableRightOnly() {
+        final Pair<String, String> pair1 = ImmutablePair.right("A");
+        final Pair<String, String> pair2 = ImmutablePair.right("B");
+        assertEquals("A", pair1.getRight());
+        assertEquals("B", pair2.getRight());
+        assertEquals(0, pair1.compareTo(pair1));
+        assertTrue(pair1.compareTo(pair2) < 0);
+        assertEquals(0, pair2.compareTo(pair2));
+        assertTrue(pair2.compareTo(pair1) > 0);
+    }
+
+    @Test
+    public void testEmptyArrayGenerics() {
+        final ImmutablePair<Integer, String>[] empty = ImmutablePair.emptyArray();
+        assertEquals(0, empty.length);
+    }
+
+    @Test
+    public void testEmptyArrayLength() {
+        @SuppressWarnings("unchecked")
+        final ImmutablePair<Integer, String>[] empty = (ImmutablePair<Integer, String>[]) ImmutablePair.EMPTY_ARRAY;
+        assertEquals(0, empty.length);
     }
 
     @Test
@@ -134,6 +157,16 @@ public class ImmutablePairTest {
     }
 
     @Test
+    public void testOfNonNull() {
+        assertThrows(NullPointerException.class, () -> ImmutablePair.ofNonNull(null, null));
+        assertThrows(NullPointerException.class, () -> ImmutablePair.ofNonNull(null, "x"));
+        assertThrows(NullPointerException.class, () -> ImmutablePair.ofNonNull("x", null));
+        final ImmutablePair<String, String> pair = ImmutablePair.ofNonNull("x", "y");
+        assertEquals("x", pair.left);
+        assertEquals("y", pair.right);
+    }
+
+    @Test
     public void testPairOfMapEntry() {
         final HashMap<Integer, String> map = new HashMap<>();
         map.put(0, "foo");
@@ -155,20 +188,15 @@ public class ImmutablePairTest {
         assertNull(pair2.getLeft());
         assertEquals("bar", pair2.right);
         assertEquals("bar", pair2.getRight());
-        final ImmutablePair pair3 = ImmutablePair.of(null, null);
+        final ImmutablePair<?, ?> pair3 = ImmutablePair.of(null, null);
         assertNull(pair3.left);
         assertNull(pair3.right);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testSerialization() throws Exception {
         final ImmutablePair<Integer, String> origPair = ImmutablePair.of(0, "foo");
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final ObjectOutputStream out = new ObjectOutputStream(baos);
-        out.writeObject(origPair);
-        final ImmutablePair<Integer, String> deserializedPair = (ImmutablePair<Integer, String>) new ObjectInputStream(
-                new ByteArrayInputStream(baos.toByteArray())).readObject();
+        final ImmutablePair<Integer, String> deserializedPair = SerializationUtils.roundtrip(origPair);
         assertEquals(origPair, deserializedPair);
         assertEquals(origPair.hashCode(), deserializedPair.hashCode());
     }
@@ -179,6 +207,25 @@ public class ImmutablePairTest {
         assertEquals("(null,two)", ImmutablePair.of(null, "two").toString());
         assertEquals("(one,null)", ImmutablePair.of("one", null).toString());
         assertEquals("(one,two)", ImmutablePair.of("one", "two").toString());
+    }
+
+    @Test
+    public void testToStringLeft() {
+        final Pair<String, String> pair = ImmutablePair.left("Key");
+        assertEquals("(Key,null)", pair.toString());
+    }
+
+    @Test
+    public void testToStringRight() {
+        final Pair<String, String> pair = ImmutablePair.right("Value");
+        assertEquals("(null,Value)", pair.toString());
+    }
+
+    @Test
+    public void testUnsupportedOperation() {
+        final ImmutablePair<Integer, String> pair = new ImmutablePair<>(0, "foo");
+        assertThrows(UnsupportedOperationException.class, () -> pair.setValue("any"));
+
     }
 
     @Test
@@ -209,41 +256,5 @@ public class ImmutablePairTest {
             assertEquals(item, entry.getKey());
             assertEquals(item.getLeft() + "" + item.getRight(), entry.getValue());
         }
-    }
-
-    @Test
-    public void testComparableLeftOnly() {
-        final Pair<String, String> pair1 = ImmutablePair.left("A");
-        final Pair<String, String> pair2 = ImmutablePair.left("B");
-        assertEquals("A", pair1.getLeft());
-        assertEquals("B", pair2.getLeft());
-        assertEquals(0, pair1.compareTo(pair1));
-        assertTrue(pair1.compareTo(pair2) < 0);
-        assertEquals(0, pair2.compareTo(pair2));
-        assertTrue(pair2.compareTo(pair1) > 0);
-    }
-
-    @Test
-    public void testComparableRightOnly() {
-        final Pair<String, String> pair1 = ImmutablePair.right("A");
-        final Pair<String, String> pair2 = ImmutablePair.right("B");
-        assertEquals("A", pair1.getRight());
-        assertEquals("B", pair2.getRight());
-        assertEquals(0, pair1.compareTo(pair1));
-        assertTrue(pair1.compareTo(pair2) < 0);
-        assertEquals(0, pair2.compareTo(pair2));
-        assertTrue(pair2.compareTo(pair1) > 0);
-    }
-
-    @Test
-    public void testToStringLeft() {
-        final Pair<String, String> pair = ImmutablePair.left("Key");
-        assertEquals("(Key,null)", pair.toString());
-    }
-
-    @Test
-    public void testToStringRight() {
-        final Pair<String, String> pair = ImmutablePair.right("Value");
-        assertEquals("(null,Value)", pair.toString());
     }
 }

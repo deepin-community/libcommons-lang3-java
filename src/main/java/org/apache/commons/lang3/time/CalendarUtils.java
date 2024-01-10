@@ -18,6 +18,9 @@
 package org.apache.commons.lang3.time;
 
 import java.util.Calendar;
+import java.util.Locale;
+import java.util.Locale.Category;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -28,11 +31,37 @@ import java.util.Objects;
 public class CalendarUtils {
 
     /**
-     * The singleton instance for {@link Calendar#getInstance()}.
+     * The singleton instance for {@link Calendar#getInstance()}. The instance is created when the class is initialized and is based on the current time in the
+     * default time zone with the default {@link Category#FORMAT} locale.
+     *
+     * @see CalendarUtils#getInstance()
      */
-    public static final CalendarUtils INSTANCE = new CalendarUtils(Calendar.getInstance());
+    public static final CalendarUtils INSTANCE = getInstance();
+
+    /**
+     * Creates a new instance based on the current time in the default time zone with the default {@link Category#FORMAT} locale.
+     *
+     * @return a new instance.
+     * @since 3.14.0
+     */
+    public static CalendarUtils getInstance() {
+        return new CalendarUtils(Calendar.getInstance());
+    }
+
+    /**
+     * Gets a CalendarUtils using the default time zone and specified locale. The <code>CalendarUtils</code> returned is based on the current time in the
+     * default time zone with the given locale.
+     *
+     * @param locale the locale for the week data
+     * @return a Calendar.
+     */
+    static CalendarUtils getInstance(final Locale locale) {
+        return new CalendarUtils(Calendar.getInstance(locale), locale);
+    }
 
     private final Calendar calendar;
+
+    private final Locale locale;
 
     /**
      * Creates an instance for the given Calendar.
@@ -40,10 +69,19 @@ public class CalendarUtils {
      * @param calendar A Calendar.
      */
     public CalendarUtils(final Calendar calendar) {
-        super();
-        this.calendar = Objects.requireNonNull(calendar, "calendar");
+        this(calendar, Locale.getDefault());
     }
 
+    /**
+     * Creates an instance for the given Calendar.
+     *
+     * @param calendar A Calendar.
+     * @param locale A Locale.
+     */
+    CalendarUtils(final Calendar calendar, final Locale locale) {
+        this.calendar = Objects.requireNonNull(calendar, "calendar");
+        this.locale = Objects.requireNonNull(locale, "locale");
+    }
     /**
      * Gets the current day of month.
      *
@@ -54,12 +92,55 @@ public class CalendarUtils {
     }
 
     /**
+     * Gets the current day of year.
+     *
+     * @return the current day of year.
+     * @since 3.13.0
+     */
+    public int getDayOfYear() {
+        return calendar.get(Calendar.DAY_OF_YEAR);
+    }
+
+    /**
      * Gets the current month.
      *
      * @return the current month.
      */
     public int getMonth() {
         return calendar.get(Calendar.MONTH);
+    }
+
+    /**
+     * Gets month names in the requested style.
+     * @param style Must be a valid {@link Calendar#getDisplayNames(int, int, Locale)} month style.
+     * @return Styled names of months
+     */
+    String[] getMonthDisplayNames(final int style) {
+        // Unfortunately standalone month names are not available in DateFormatSymbols,
+        // so we have to extract them.
+        final Map<String, Integer> displayNames = calendar.getDisplayNames(Calendar.MONTH, style, locale);
+        if (displayNames == null) {
+            return null;
+        }
+        final String[] monthNames = new String[displayNames.size()];
+        displayNames.forEach((k, v) -> monthNames[v] = k);
+        return monthNames;
+    }
+
+    /**
+     * Gets full standalone month names as used in "LLLL" date formatting.
+     * @return Long names of months
+     */
+    String[] getStandaloneLongMonthNames() {
+        return getMonthDisplayNames(Calendar.LONG_STANDALONE);
+    }
+
+    /**
+     * Gets short standalone month names as used in "LLLL" date formatting.
+     * @return Short names of months
+     */
+    String[] getStandaloneShortMonthNames() {
+        return getMonthDisplayNames(Calendar.SHORT_STANDALONE);
     }
 
     /**

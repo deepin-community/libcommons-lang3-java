@@ -1,3 +1,2 @@
 disable_testGetUserHome_test.diff
 ignore-benchmarks.diff
-easymock-compatibility.patch
