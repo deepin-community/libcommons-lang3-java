@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.AbstractLangTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -36,7 +37,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * Compare FastDateParser with SimpleDateFormat
  */
-public class FastDateParserSDFTest {
+public class FastDateParserSDFTest extends AbstractLangTest {
+
+    private static final TimeZone timeZone = TimeZone.getDefault();
 
     public static Stream<Arguments> data() {
         return Stream.of(
@@ -102,44 +105,6 @@ public class FastDateParserSDFTest {
         );
     }
 
-    private static final TimeZone timeZone = TimeZone.getDefault();
-
-    @ParameterizedTest
-    @MethodSource("data")
-    public void testOriginal(final String format, final String input, final Locale locale, final boolean valid) {
-        checkParse(input, format, locale, valid);
-    }
-
-    @ParameterizedTest
-    @MethodSource("data")
-    public void testOriginalPP(final String format, final String input, final Locale locale, final boolean valid) {
-        checkParsePosition(input, format, locale, valid);
-    }
-
-    @ParameterizedTest
-    @MethodSource("data")
-    public void testUpperCase(final String format, final String input, final Locale locale, final boolean valid) {
-        checkParse(input.toUpperCase(locale), format, locale, valid);
-    }
-
-    @ParameterizedTest
-    @MethodSource("data")
-    public void testUpperCasePP(final String format, final String input, final Locale locale, final boolean valid) {
-        checkParsePosition(input.toUpperCase(locale), format, locale, valid);
-    }
-
-    @ParameterizedTest
-    @MethodSource("data")
-    public void testLowerCase(final String format, final String input, final Locale locale, final boolean valid) {
-        checkParse(input.toLowerCase(locale), format, locale, valid);
-    }
-
-    @ParameterizedTest
-    @MethodSource("data")
-    public void testLowerCasePP(final String format, final String input, final Locale locale, final boolean valid) {
-        checkParsePosition(input.toLowerCase(locale), format, locale, valid);
-    }
-
     private void checkParse(final String formattedDate, final String format, final Locale locale, final boolean valid) {
         final SimpleDateFormat sdf = new SimpleDateFormat(format, locale);
         sdf.setTimeZone(timeZone);
@@ -176,6 +141,7 @@ public class FastDateParserSDFTest {
             assertEquals(sdfE, fdfE, locale.toString()+" "+formattedDate + " expected same Exception ");
         }
     }
+
     private void checkParsePosition(final String formattedDate, final String format, final Locale locale, final boolean valid) {
         final SimpleDateFormat sdf = new SimpleDateFormat(format, locale);
         sdf.setTimeZone(timeZone);
@@ -213,5 +179,40 @@ public class FastDateParserSDFTest {
             assertTrue(sdferrorIndex - fdferrorIndex <= 4,
                     "FDF error index ("+ fdferrorIndex + ") should approximate SDF index (" + sdferrorIndex + ")");
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testLowerCase(final String format, final String input, final Locale locale, final boolean valid) {
+        checkParse(input.toLowerCase(locale), format, locale, valid);
+    }
+
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testLowerCasePP(final String format, final String input, final Locale locale, final boolean valid) {
+        checkParsePosition(input.toLowerCase(locale), format, locale, valid);
+    }
+
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testOriginal(final String format, final String input, final Locale locale, final boolean valid) {
+        checkParse(input, format, locale, valid);
+    }
+
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testOriginalPP(final String format, final String input, final Locale locale, final boolean valid) {
+        checkParsePosition(input, format, locale, valid);
+    }
+
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testUpperCase(final String format, final String input, final Locale locale, final boolean valid) {
+        checkParse(input.toUpperCase(locale), format, locale, valid);
+    }
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testUpperCasePP(final String format, final String input, final Locale locale, final boolean valid) {
+        checkParsePosition(input.toUpperCase(locale), format, locale, valid);
     }
 }

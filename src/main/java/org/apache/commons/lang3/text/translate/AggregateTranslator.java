@@ -23,11 +23,11 @@ import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Executes a sequence of translators one after the other. Execution ends whenever
- * the first translator consumes codepoints from the input.
+ * the first translator consumes code points from the input.
  *
  * @since 3.0
- * @deprecated as of 3.6, use commons-text
- * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/AggregateTranslator.html">
+ * @deprecated As of 3.6, use Apache Commons Text
+ * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/translate/AggregateTranslator.html">
  * AggregateTranslator</a> instead
  */
 @Deprecated
@@ -45,8 +45,8 @@ public class AggregateTranslator extends CharSequenceTranslator {
     }
 
     /**
-     * The first translator to consume codepoints from the input is the 'winner'.
-     * Execution stops with the number of consumed codepoints being returned.
+     * The first translator to consume code points from the input is the 'winner'.
+     * Execution stops with the number of consumed code points being returned.
      * {@inheritDoc}
      */
     @Override

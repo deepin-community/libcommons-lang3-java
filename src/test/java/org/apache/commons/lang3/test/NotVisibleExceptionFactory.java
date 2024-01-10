@@ -22,7 +22,21 @@ package org.apache.commons.lang3.test;
  */
 public class NotVisibleExceptionFactory {
 
-  private NotVisibleExceptionFactory() {}
+  private static final class NotVisibleException extends Exception {
+
+    private static final long serialVersionUID = 1L; // avoid warning
+
+    private final Throwable cause;
+
+    private NotVisibleException(final Throwable cause) {
+      this.cause = cause;
+    }
+
+    @Override
+    public synchronized Throwable getCause() {
+      return cause;
+    }
+  }
 
   /**
    * Create a new Exception whose getCause method returns the
@@ -34,19 +48,5 @@ public class NotVisibleExceptionFactory {
     return new NotVisibleException(cause);
   }
 
-  private static class NotVisibleException extends Exception {
-
-    private static final long serialVersionUID = 1L; // avoid warning
-
-    private final Throwable cause;
-
-    private NotVisibleException(final Throwable cause) {
-      this.cause = cause;
-    }
-
-    @Override
-    public Throwable getCause() {
-      return cause;
-    }
-  }
+  private NotVisibleExceptionFactory() {}
 }

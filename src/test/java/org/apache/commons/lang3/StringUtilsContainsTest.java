@@ -16,6 +16,10 @@
  */
 package org.apache.commons.lang3;
 
+import static org.apache.commons.lang3.Supplementary.CharU20000;
+import static org.apache.commons.lang3.Supplementary.CharU20001;
+import static org.apache.commons.lang3.Supplementary.CharUSuppCharHigh;
+import static org.apache.commons.lang3.Supplementary.CharUSuppCharLow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,29 +32,7 @@ import org.junitpioneer.jupiter.DefaultLocale;
 /**
  * Unit tests {@link org.apache.commons.lang3.StringUtils} - Contains methods
  */
-public class StringUtilsContainsTest  {
-    /**
-     * Supplementary character U+20000
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
-     */
-    private static final String CharU20000 = "\uD840\uDC00";
-    /**
-     * Supplementary character U+20001
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
-     */
-    private static final String CharU20001 = "\uD840\uDC01";
-    /**
-     * Incomplete supplementary character U+20000, high surrogate only.
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
-     */
-    private static final String CharUSuppCharHigh = "\uDC00";
-
-    /**
-     * Incomplete supplementary character U+20000, low surrogate only.
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
-     */
-    private static final String CharUSuppCharLow = "\uD840";
-
+public class StringUtilsContainsTest extends AbstractLangTest {
     @Test
     public void testContains_Char() {
         assertFalse(StringUtils.contains(null, ' '));
@@ -79,7 +61,7 @@ public class StringUtilsContainsTest  {
     }
 
     /**
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
+     * See https://www.oracle.com/technical-resources/articles/javase/supplementary.html
      */
     @Test
     public void testContains_StringWithBadSupplementaryChars() {
@@ -94,7 +76,7 @@ public class StringUtilsContainsTest  {
     }
 
     /**
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
+     * See https://www.oracle.com/technical-resources/articles/javase/supplementary.html
      */
     @Test
     public void testContains_StringWithSupplementaryChars() {
@@ -123,7 +105,7 @@ public class StringUtilsContainsTest  {
     }
 
     /**
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
+     * See https://www.oracle.com/technical-resources/articles/javase/supplementary.html
      */
     @Test
     public void testContainsAny_StringCharArrayWithBadSupplementaryChars() {
@@ -138,7 +120,7 @@ public class StringUtilsContainsTest  {
     }
 
     /**
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
+     * See https://www.oracle.com/technical-resources/articles/javase/supplementary.html
      */
     @Test
     public void testContainsAny_StringCharArrayWithSupplementaryChars() {
@@ -175,37 +157,6 @@ public class StringUtilsContainsTest  {
         assertFalse(StringUtils.containsAny("ab", "z"));
     }
 
-    /**
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
-     */
-    @Test
-    public void testContainsAny_StringWithBadSupplementaryChars() {
-        // Test edge case: 1/2 of a (broken) supplementary char
-        assertFalse(StringUtils.containsAny(CharUSuppCharHigh, CharU20001));
-        assertEquals(-1, CharUSuppCharLow.indexOf(CharU20001));
-        assertFalse(StringUtils.containsAny(CharUSuppCharLow, CharU20001));
-        assertFalse(StringUtils.containsAny(CharU20001, CharUSuppCharHigh));
-        assertEquals(0, CharU20001.indexOf(CharUSuppCharLow));
-        assertTrue(StringUtils.containsAny(CharU20001, CharUSuppCharLow));
-    }
-
-    /**
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
-     */
-    @Test
-    public void testContainsAny_StringWithSupplementaryChars() {
-        assertTrue(StringUtils.containsAny(CharU20000 + CharU20001, CharU20000));
-        assertTrue(StringUtils.containsAny(CharU20000 + CharU20001, CharU20001));
-        assertTrue(StringUtils.containsAny(CharU20000, CharU20000));
-        // Sanity check:
-        assertEquals(-1, CharU20000.indexOf(CharU20001));
-        assertEquals(0, CharU20000.indexOf(CharU20001.charAt(0)));
-        assertEquals(-1, CharU20000.indexOf(CharU20001.charAt(1)));
-        // Test:
-        assertFalse(StringUtils.containsAny(CharU20000, CharU20001));
-        assertFalse(StringUtils.containsAny(CharU20001, CharU20000));
-    }
-
     @Test
     public void testContainsAny_StringStringArray() {
         assertFalse(StringUtils.containsAny(null, (String[]) null));
@@ -225,6 +176,58 @@ public class StringUtilsContainsTest  {
         assertTrue(StringUtils.containsAny("abcd", "ab", null));
         assertTrue(StringUtils.containsAny("abcd", "ab", "cd"));
         assertTrue(StringUtils.containsAny("abc", "d", "abc"));
+    }
+
+    /**
+     * See https://www.oracle.com/technical-resources/articles/javase/supplementary.html
+     */
+    @Test
+    public void testContainsAny_StringWithBadSupplementaryChars() {
+        // Test edge case: 1/2 of a (broken) supplementary char
+        assertFalse(StringUtils.containsAny(CharUSuppCharHigh, CharU20001));
+        assertEquals(-1, CharUSuppCharLow.indexOf(CharU20001));
+        assertFalse(StringUtils.containsAny(CharUSuppCharLow, CharU20001));
+        assertFalse(StringUtils.containsAny(CharU20001, CharUSuppCharHigh));
+        assertEquals(0, CharU20001.indexOf(CharUSuppCharLow));
+        assertTrue(StringUtils.containsAny(CharU20001, CharUSuppCharLow));
+    }
+
+    /**
+     * See https://www.oracle.com/technical-resources/articles/javase/supplementary.html
+     */
+    @Test
+    public void testContainsAny_StringWithSupplementaryChars() {
+        assertTrue(StringUtils.containsAny(CharU20000 + CharU20001, CharU20000));
+        assertTrue(StringUtils.containsAny(CharU20000 + CharU20001, CharU20001));
+        assertTrue(StringUtils.containsAny(CharU20000, CharU20000));
+        // Sanity check:
+        assertEquals(-1, CharU20000.indexOf(CharU20001));
+        assertEquals(0, CharU20000.indexOf(CharU20001.charAt(0)));
+        assertEquals(-1, CharU20000.indexOf(CharU20001.charAt(1)));
+        // Test:
+        assertFalse(StringUtils.containsAny(CharU20000, CharU20001));
+        assertFalse(StringUtils.containsAny(CharU20001, CharU20000));
+    }
+
+    @Test
+    public void testContainsAnyIgnoreCase_StringStringArray() {
+        assertFalse(StringUtils.containsAnyIgnoreCase(null, (String[]) null));
+        assertFalse(StringUtils.containsAnyIgnoreCase(null, new String[0]));
+        assertFalse(StringUtils.containsAnyIgnoreCase(null, new String[] { "hello" }));
+        assertFalse(StringUtils.containsAnyIgnoreCase("", (String[]) null));
+        assertFalse(StringUtils.containsAnyIgnoreCase("", new String[0]));
+        assertFalse(StringUtils.containsAnyIgnoreCase("", new String[] { "hello" }));
+        assertFalse(StringUtils.containsAnyIgnoreCase("hello, goodbye", (String[]) null));
+        assertFalse(StringUtils.containsAnyIgnoreCase("hello, goodbye", new String[0]));
+        assertTrue(StringUtils.containsAnyIgnoreCase("hello, goodbye", new String[]{"hello", "goodbye"}));
+        assertTrue(StringUtils.containsAnyIgnoreCase("hello, goodbye", new String[]{"hello", "Goodbye"}));
+        assertTrue(StringUtils.containsAnyIgnoreCase("hello, goodbye", new String[]{"Hello", "Goodbye"}));
+        assertTrue(StringUtils.containsAnyIgnoreCase("hello, goodbye", new String[]{"Hello", null}));
+        assertTrue(StringUtils.containsAnyIgnoreCase("hello, null", new String[] { "Hello", null }));
+        // Javadoc examples:
+        assertTrue(StringUtils.containsAnyIgnoreCase("abcd", "ab", null));
+        assertTrue(StringUtils.containsAnyIgnoreCase("abcd", "ab", "cd"));
+        assertTrue(StringUtils.containsAnyIgnoreCase("abc", "d", "abc"));
     }
 
     @DefaultLocale(language = "de", country = "DE")
@@ -293,7 +296,7 @@ public class StringUtilsContainsTest  {
         final char[] chars1= {'b'};
         final char[] chars2= {'.'};
         final char[] chars3= {'c', 'd'};
-        final char[] emptyChars = new char[0];
+        final char[] emptyChars = {};
         assertTrue(StringUtils.containsNone(null, (char[]) null));
         assertTrue(StringUtils.containsNone("", (char[]) null));
         assertTrue(StringUtils.containsNone(null, emptyChars));
@@ -312,7 +315,7 @@ public class StringUtilsContainsTest  {
     }
 
     /**
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
+     * See https://www.oracle.com/technical-resources/articles/javase/supplementary.html
      */
     @Test
     public void testContainsNone_CharArrayWithBadSupplementaryChars() {
@@ -327,7 +330,7 @@ public class StringUtilsContainsTest  {
     }
 
     /**
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
+     * See https://www.oracle.com/technical-resources/articles/javase/supplementary.html
      */
     @Test
     public void testContainsNone_CharArrayWithSupplementaryChars() {
@@ -369,7 +372,7 @@ public class StringUtilsContainsTest  {
     }
 
     /**
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
+     * See https://www.oracle.com/technical-resources/articles/javase/supplementary.html
      */
     @Test
     public void testContainsNone_StringWithBadSupplementaryChars() {
@@ -384,7 +387,7 @@ public class StringUtilsContainsTest  {
     }
 
     /**
-     * See http://www.oracle.com/technetwork/articles/javase/supplementary-142654.html
+     * See https://www.oracle.com/technical-resources/articles/javase/supplementary.html
      */
     @Test
     public void testContainsNone_StringWithSupplementaryChars() {
@@ -408,7 +411,7 @@ public class StringUtilsContainsTest  {
         final char[] chars1= {'b'};
         final char[] chars2= {'a'};
         final char[] chars3= {'a', 'b'};
-        final char[] emptyChars = new char[0];
+        final char[] emptyChars = {};
         assertFalse(StringUtils.containsOnly(null, (char[]) null));
         assertFalse(StringUtils.containsOnly("", (char[]) null));
         assertFalse(StringUtils.containsOnly(null, emptyChars));

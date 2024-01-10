@@ -28,12 +28,30 @@ import java.io.Writer;
  * 1 to 377. This is because parsing Java is the main use case.
  *
  * @since 3.0
- * @deprecated as of 3.6, use commons-text
+ * @deprecated As of 3.6, use Apache Commons Text
  * <a href="https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/translate/OctalUnescaper.html">
  * OctalUnescaper</a> instead
  */
 @Deprecated
 public class OctalUnescaper extends CharSequenceTranslator {
+
+    /**
+     * Checks if the given char is an octal digit. Octal digits are the character representations of the digits 0 to 7.
+     * @param ch the char to check
+     * @return true if the given char is the character representation of one of the digits from 0 to 7
+     */
+    private boolean isOctalDigit(final char ch) {
+        return ch >= '0' && ch <= '7';
+    }
+
+    /**
+     * Checks if the given char is the character representation of one of the digit from 0 to 3.
+     * @param ch the char to check
+     * @return true if the given char is the character representation of one of the digits from 0 to 3
+     */
+    private boolean isZeroToThree(final char ch) {
+        return ch >= '0' && ch <= '3';
+    }
 
     /**
      * {@inheritDoc}
@@ -61,23 +79,5 @@ public class OctalUnescaper extends CharSequenceTranslator {
             return 1 + builder.length();
         }
         return 0;
-    }
-
-    /**
-     * Checks if the given char is an octal digit. Octal digits are the character representations of the digits 0 to 7.
-     * @param ch the char to check
-     * @return true if the given char is the character representation of one of the digits from 0 to 7
-     */
-    private boolean isOctalDigit(final char ch) {
-        return ch >= '0' && ch <= '7';
-    }
-
-    /**
-     * Checks if the given char is the character representation of one of the digit from 0 to 3.
-     * @param ch the char to check
-     * @return true if the given char is the character representation of one of the digits from 0 to 3
-     */
-    private boolean isZeroToThree(final char ch) {
-        return ch >= '0' && ch <= '3';
     }
 }
