@@ -1,3 +1,10 @@
+libcommons-lang3-java (3.14.0-1deepin1) unstable; urgency=medium
+
+  * Fix CVE-2025-48924: rewrite ClassUtils.getClass() without recursion
+    to avoid StackOverflowError on very long inputs.
+
+ -- deepin-ci-robot <packages@deepin.org>  Mon, 27 Apr 2026 18:16:27 +0800
+
 libcommons-lang3-java (3.14.0-1) unstable; urgency=medium
 
   * New upstream release
