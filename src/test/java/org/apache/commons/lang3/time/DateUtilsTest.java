@@ -82,7 +82,7 @@ public class DateUtilsTest extends AbstractLangTest {
     private static void assertWeekIterator(final Iterator<?> it, final Calendar start, final Calendar end) {
         Calendar cal = (Calendar) it.next();
         assertCalendarsEquals("", start, cal, 0);
-        Calendar last = null;
+        Calendar last;
         int count = 1;
         while (it.hasNext()) {
             //Check this is just a date (no time component)
@@ -789,7 +789,7 @@ public class DateUtilsTest extends AbstractLangTest {
         assertThrows(ClassCastException.class, () -> DateUtils.iterator("", DateUtils.RANGE_WEEK_CENTER));
     }
 
-    /** https://issues.apache.org/jira/browse/LANG-530 */
+    /** See https://issues.apache.org/jira/browse/LANG-530 */
     @SuppressWarnings("deprecation")
     @Test
     public void testLang530() throws ParseException {
@@ -955,7 +955,6 @@ public class DateUtilsTest extends AbstractLangTest {
         assertEquals(dateParser.parse("November 16, 2001"),
                 DateUtils.round(date2, DateUtils.SEMI_MONTH),
                 "round semimonth-2 failed");
-
 
         assertEquals(dateParser.parse("February 13, 2002"),
                 DateUtils.round(date1, Calendar.DATE),
@@ -1607,13 +1606,13 @@ public class DateUtilsTest extends AbstractLangTest {
             assertEquals("2004-10-31 01:02:03.000 -06:00", format.format(oct31_01_02_03MDT), "Check 01:02:03.000");
             assertEquals("2004-10-31 01:02:03.004 -06:00", format.format(oct31_01_02_03_04MDT), "Check 01:02:03.004");
 
-            // ------- Demonstrate Problem -------
+            // Demonstrate Problem
             final Calendar gval = Calendar.getInstance();
             gval.setTime(new Date(oct31_01MDT.getTime()));
             gval.set(Calendar.MINUTE, gval.get(Calendar.MINUTE)); // set minutes to the same value
             assertEquals(gval.getTime().getTime(), oct31_01MDT.getTime() + 3600000L, "Demonstrate Problem");
 
-            // ---------- Test Truncate ----------
+            // Test Truncate
             assertEquals(oct31_01_02_03_04MDT, DateUtils.truncate(oct31_01_02_03_04MDT, Calendar.MILLISECOND),
                     "Truncate Calendar.MILLISECOND");
 
@@ -1632,7 +1631,7 @@ public class DateUtilsTest extends AbstractLangTest {
             assertEquals(oct31MDT, DateUtils.truncate(oct31_01_02_03_04MDT, Calendar.DATE),
                     "Truncate Calendar.DATE");
 
-            // ---------- Test Round (down) ----------
+            // Test Round (down)
             assertEquals(oct31_01_02_03_04MDT, DateUtils.round(oct31_01_02_03_04MDT, Calendar.MILLISECOND),
                     "Round Calendar.MILLISECOND");
 
@@ -1662,13 +1661,13 @@ public class DateUtilsTest extends AbstractLangTest {
     @Test
     public void testWeekIterator() {
         final Calendar now = Calendar.getInstance();
-        for (int i = 0; i< 7; i++) {
+        for (int i = 0; i < 7; i++) {
             final Calendar today = DateUtils.truncate(now, Calendar.DATE);
             final Calendar sunday = DateUtils.truncate(now, Calendar.DATE);
             sunday.add(Calendar.DATE, 1 - sunday.get(Calendar.DAY_OF_WEEK));
             final Calendar monday = DateUtils.truncate(now, Calendar.DATE);
             if (monday.get(Calendar.DAY_OF_WEEK) == 1) {
-                //This is sunday... roll back 6 days
+                // This is sunday... roll back 6 days
                 monday.add(Calendar.DATE, -6);
             } else {
                 monday.add(Calendar.DATE, 2 - monday.get(Calendar.DAY_OF_WEEK));

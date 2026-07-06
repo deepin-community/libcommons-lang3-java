@@ -44,7 +44,7 @@ import org.apache.commons.lang3.ThreadUtils.ThreadPredicate;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests {@link org.apache.commons.lang3.ThreadUtils}.
+ * Unit tests {@link ThreadUtils}.
  */
 public class ThreadUtilsTest extends AbstractLangTest {
 
@@ -155,14 +155,14 @@ public class ThreadUtilsTest extends AbstractLangTest {
     @Test
     public void testGetAllThreadGroupsDoesNotReturnNull() {
         // LANG-1706 getAllThreadGroups and findThreadGroups should not return null items
-        Collection<ThreadGroup> threads = ThreadUtils.getAllThreadGroups();
+        final Collection<ThreadGroup> threads = ThreadUtils.getAllThreadGroups();
         assertEquals(0, threads.stream().filter(Objects::isNull).count());
     }
 
     @Test
     public void testGetAllThreadsDoesNotReturnNull() {
         // LANG-1706 getAllThreads and findThreads should not return null items
-        Collection<Thread> threads = ThreadUtils.getAllThreads();
+        final Collection<Thread> threads = ThreadUtils.getAllThreads();
         assertEquals(0, threads.stream().filter(Objects::isNull).count());
     }
 

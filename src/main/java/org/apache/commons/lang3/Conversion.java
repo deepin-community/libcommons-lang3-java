@@ -18,7 +18,6 @@ package org.apache.commons.lang3;
 
 import java.util.UUID;
 
-
 /**
  * Static methods to convert a type into another, with endianness and bit ordering awareness.
  *
@@ -39,12 +38,12 @@ import java.util.UUID;
  * <li>uuid</li>
  * </ul>
  * <p>
- * Endianness field: little endian is the default, in this case the field is absent. In case of
- * big endian, the field is "Be".<br> Bit ordering: Lsb0 is the default, in this case the field
+ * Endianness field: little-endian is the default, in this case the field is absent. In case of
+ * big-endian, the field is "Be".<br> Bit ordering: Lsb0 is the default, in this case the field
  * is absent. In case of Msb0, the field is "Msb0".
  * </p>
  * <p>
- * Example: intBeMsb0ToHex convert an int with big endian byte order and Msb0 bit order into its
+ * Example: intBeMsb0ToHex convert an int with big-endian byte order and Msb0 bit order into its
  * hexadecimal string representation
  * </p>
  * <p>
@@ -53,13 +52,12 @@ import java.util.UUID;
  * you should not need to use "Be" and "Msb0" methods.
  * </p>
  * <p>
- * Development status: work on going, only a part of the little endian, Lsb0 methods implemented
+ * Development status: work on going, only a part of the little-endian, Lsb0 methods implemented
  * so far.
  * </p>
  *
  * @since 3.2
  */
-
 public class Conversion {
 
     private static final boolean[] TTTT = {true, true, true, true};
@@ -80,7 +78,7 @@ public class Conversion {
     private static final boolean[] FFFF = {false, false, false, false};
 
     /**
-     * Converts the first 4 bits of a binary (represented as boolean array) in big endian Msb0
+     * Converts the first 4 bits of a binary (represented as boolean array) in big-endian Msb0
      * bit ordering to a hexadecimal digit.
      *
      * <p>
@@ -98,7 +96,7 @@ public class Conversion {
     }
 
     /**
-     * Converts a binary (represented as boolean array) in big endian Msb0 bit ordering to a
+     * Converts a binary (represented as boolean array) in big-endian Msb0 bit ordering to a
      * hexadecimal digit.
      *
      * <p>
@@ -176,7 +174,7 @@ public class Conversion {
             final int shift = i + dstPos;
             final int bits = (src[i + srcPos] ? 1 : 0) << shift;
             final int mask = 0x1 << shift;
-            out = (byte) ((out & ~mask) | bits);
+            out = (byte) (out & ~mask | bits);
         }
         return out;
     }
@@ -333,7 +331,7 @@ public class Conversion {
             final int shift = i + dstPos;
             final int bits = (src[i + srcPos] ? 1 : 0) << shift;
             final int mask = 0x1 << shift;
-            out = (out & ~mask) | bits;
+            out = out & ~mask | bits;
         }
         return out;
     }
@@ -366,7 +364,7 @@ public class Conversion {
             final int shift = i + dstPos;
             final long bits = (src[i + srcPos] ? 1L : 0) << shift;
             final long mask = 0x1L << shift;
-            out = (out & ~mask) | bits;
+            out = out & ~mask | bits;
         }
         return out;
     }
@@ -399,13 +397,13 @@ public class Conversion {
             final int shift = i + dstPos;
             final int bits = (src[i + srcPos] ? 1 : 0) << shift;
             final int mask = 0x1 << shift;
-            out = (short) ((out & ~mask) | bits);
+            out = (short) (out & ~mask | bits);
         }
         return out;
     }
 
     /**
-     * Converts an array of byte into an int using the default (little endian, Lsb0) byte and bit
+     * Converts an array of byte into an int using the default (little-endian, Lsb0) byte and bit
      * ordering.
      *
      * @param src the byte array to convert
@@ -432,13 +430,13 @@ public class Conversion {
             final int shift = i * 8 + dstPos;
             final int bits = (0xff & src[i + srcPos]) << shift;
             final int mask = 0xff << shift;
-            out = (out & ~mask) | bits;
+            out = out & ~mask | bits;
         }
         return out;
     }
 
     /**
-     * Converts an array of byte into a long using the default (little endian, Lsb0) byte and
+     * Converts an array of byte into a long using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the byte array to convert
@@ -465,13 +463,13 @@ public class Conversion {
             final int shift = i * 8 + dstPos;
             final long bits = (0xffL & src[i + srcPos]) << shift;
             final long mask = 0xffL << shift;
-            out = (out & ~mask) | bits;
+            out = out & ~mask | bits;
         }
         return out;
     }
 
     /**
-     * Converts an array of byte into a short using the default (little endian, Lsb0) byte and
+     * Converts an array of byte into a short using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the byte array to convert
@@ -498,13 +496,13 @@ public class Conversion {
             final int shift = i * 8 + dstPos;
             final int bits = (0xff & src[i + srcPos]) << shift;
             final int mask = 0xff << shift;
-            out = (short) ((out & ~mask) | bits);
+            out = (short) (out & ~mask | bits);
         }
         return out;
     }
 
     /**
-     * Converts bytes from an array into a UUID using the default (little endian, Lsb0) byte and
+     * Converts bytes from an array into a UUID using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the byte array to convert
@@ -522,7 +520,7 @@ public class Conversion {
     }
 
     /**
-     * Converts a byte into an array of boolean using the default (little endian, Lsb0) byte and
+     * Converts a byte into an array of boolean using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the byte to convert
@@ -546,13 +544,13 @@ public class Conversion {
         }
         for (int i = 0; i < nBools; i++) {
             final int shift = i + srcPos;
-            dst[dstPos + i] = (0x1 & (src >> shift)) != 0;
+            dst[dstPos + i] = (0x1 & src >> shift) != 0;
         }
         return dst;
     }
 
     /**
-     * Converts a byte into an array of Char using the default (little endian, Lsb0) byte and
+     * Converts a byte into an array of Char using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the byte to convert
@@ -577,7 +575,7 @@ public class Conversion {
         int append = sb.length();
         for (int i = 0; i < nHexs; i++) {
             final int shift = i * 4 + srcPos;
-            final int bits = 0xF & (src >> shift);
+            final int bits = 0xF & src >> shift;
             if (dstPos + i == append) {
                 ++append;
                 sb.append(intToHexDigit(bits));
@@ -778,7 +776,7 @@ public class Conversion {
     }
 
     /**
-     * Converts an array of Char into a byte using the default (little endian, Lsb0) byte and
+     * Converts a hexadecimal string into a byte using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the hexadecimal string to convert
@@ -788,7 +786,7 @@ public class Conversion {
      * @param dstPos the position of the lsb, in bits, in the result byte
      * @param nHex the number of Chars to convert
      * @return a byte containing the selected bits
-     * @throws IllegalArgumentException if {@code (nHexs-1)*4+dstPos >= 8}
+     * @throws IllegalArgumentException if {@code (nHex-1)*4+dstPos >= 8}
      */
     public static byte hexToByte(final String src, final int srcPos, final byte dstInit, final int dstPos,
             final int nHex) {
@@ -796,20 +794,20 @@ public class Conversion {
             return dstInit;
         }
         if ((nHex - 1) * 4 + dstPos >= 8) {
-            throw new IllegalArgumentException("(nHexs-1)*4+dstPos is greater or equal to than 8");
+            throw new IllegalArgumentException("(nHex-1)*4+dstPos is greater than or equal to 8");
         }
         byte out = dstInit;
         for (int i = 0; i < nHex; i++) {
             final int shift = i * 4 + dstPos;
             final int bits = (0xf & hexDigitToInt(src.charAt(i + srcPos))) << shift;
             final int mask = 0xf << shift;
-            out = (byte) ((out & ~mask) | bits);
+            out = (byte) (out & ~mask | bits);
         }
         return out;
     }
 
     /**
-     * Converts an array of Char into an int using the default (little endian, Lsb0) byte and bit
+     * Converts an array of Char into an int using the default (little-endian, Lsb0) byte and bit
      * ordering.
      *
      * @param src the hexadecimal string to convert
@@ -833,13 +831,13 @@ public class Conversion {
             final int shift = i * 4 + dstPos;
             final int bits = (0xf & hexDigitToInt(src.charAt(i + srcPos))) << shift;
             final int mask = 0xf << shift;
-            out = (out & ~mask) | bits;
+            out = out & ~mask | bits;
         }
         return out;
     }
 
     /**
-     * Converts an array of Char into a long using the default (little endian, Lsb0) byte and
+     * Converts an array of Char into a long using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the hexadecimal string to convert
@@ -864,13 +862,13 @@ public class Conversion {
             final int shift = i * 4 + dstPos;
             final long bits = (0xfL & hexDigitToInt(src.charAt(i + srcPos))) << shift;
             final long mask = 0xfL << shift;
-            out = (out & ~mask) | bits;
+            out = out & ~mask | bits;
         }
         return out;
     }
 
     /**
-     * Converts an array of Char into a short using the default (little endian, Lsb0) byte and
+     * Converts an array of Char into a short using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the hexadecimal string to convert
@@ -895,13 +893,13 @@ public class Conversion {
             final int shift = i * 4 + dstPos;
             final int bits = (0xf & hexDigitToInt(src.charAt(i + srcPos))) << shift;
             final int mask = 0xf << shift;
-            out = (short) ((out & ~mask) | bits);
+            out = (short) (out & ~mask | bits);
         }
         return out;
     }
 
     /**
-     * Converts an array of int into a long using the default (little endian, Lsb0) byte and bit
+     * Converts an array of int into a long using the default (little-endian, Lsb0) byte and bit
      * ordering.
      *
      * @param src the int array to convert
@@ -928,13 +926,13 @@ public class Conversion {
             final int shift = i * 32 + dstPos;
             final long bits = (0xffffffffL & src[i + srcPos]) << shift;
             final long mask = 0xffffffffL << shift;
-            out = (out & ~mask) | bits;
+            out = out & ~mask | bits;
         }
         return out;
     }
 
     /**
-     * Converts an int into an array of boolean using the default (little endian, Lsb0) byte and
+     * Converts an int into an array of boolean using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the int to convert
@@ -958,13 +956,13 @@ public class Conversion {
         }
         for (int i = 0; i < nBools; i++) {
             final int shift = i + srcPos;
-            dst[dstPos + i] = (0x1 & (src >> shift)) != 0;
+            dst[dstPos + i] = (0x1 & src >> shift) != 0;
         }
         return dst;
     }
 
     /**
-     * Converts an int into an array of byte using the default (little endian, Lsb0) byte and bit
+     * Converts an int into an array of byte using the default (little-endian, Lsb0) byte and bit
      * ordering.
      *
      * @param src the int to convert
@@ -988,13 +986,13 @@ public class Conversion {
         }
         for (int i = 0; i < nBytes; i++) {
             final int shift = i * 8 + srcPos;
-            dst[dstPos + i] = (byte) (0xff & (src >> shift));
+            dst[dstPos + i] = (byte) (0xff & src >> shift);
         }
         return dst;
     }
 
     /**
-     * Converts an int into an array of Char using the default (little endian, Lsb0) byte and bit
+     * Converts an int into an array of Char using the default (little-endian, Lsb0) byte and bit
      * ordering.
      *
      * @param src the int to convert
@@ -1019,7 +1017,7 @@ public class Conversion {
         int append = sb.length();
         for (int i = 0; i < nHexs; i++) {
             final int shift = i * 4 + srcPos;
-            final int bits = 0xF & (src >> shift);
+            final int bits = 0xF & src >> shift;
             if (dstPos + i == append) {
                 ++append;
                 sb.append(intToHexDigit(bits));
@@ -1112,7 +1110,7 @@ public class Conversion {
     }
 
     /**
-     * Converts an int into an array of short using the default (little endian, Lsb0) byte and
+     * Converts an int into an array of short using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the int to convert
@@ -1136,13 +1134,13 @@ public class Conversion {
         }
         for (int i = 0; i < nShorts; i++) {
             final int shift = i * 16 + srcPos;
-            dst[dstPos + i] = (short) (0xffff & (src >> shift));
+            dst[dstPos + i] = (short) (0xffff & src >> shift);
         }
         return dst;
     }
 
     /**
-     * Converts a long into an array of boolean using the default (little endian, Lsb0) byte and
+     * Converts a long into an array of boolean using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the long to convert
@@ -1166,13 +1164,13 @@ public class Conversion {
         }
         for (int i = 0; i < nBools; i++) {
             final int shift = i + srcPos;
-            dst[dstPos + i] = (0x1 & (src >> shift)) != 0;
+            dst[dstPos + i] = (0x1 & src >> shift) != 0;
         }
         return dst;
     }
 
     /**
-     * Converts a long into an array of byte using the default (little endian, Lsb0) byte and
+     * Converts a long into an array of byte using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the long to convert
@@ -1196,13 +1194,13 @@ public class Conversion {
         }
         for (int i = 0; i < nBytes; i++) {
             final int shift = i * 8 + srcPos;
-            dst[dstPos + i] = (byte) (0xff & (src >> shift));
+            dst[dstPos + i] = (byte) (0xff & src >> shift);
         }
         return dst;
     }
 
     /**
-     * Converts a long into an array of Char using the default (little endian, Lsb0) byte and
+     * Converts a long into an array of Char using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the long to convert
@@ -1227,7 +1225,7 @@ public class Conversion {
         int append = sb.length();
         for (int i = 0; i < nHexs; i++) {
             final int shift = i * 4 + srcPos;
-            final int bits = (int) (0xF & (src >> shift));
+            final int bits = (int) (0xF & src >> shift);
             if (dstPos + i == append) {
                 ++append;
                 sb.append(intToHexDigit(bits));
@@ -1239,7 +1237,7 @@ public class Conversion {
     }
 
     /**
-     * Converts a long into an array of int using the default (little endian, Lsb0) byte and bit
+     * Converts a long into an array of int using the default (little-endian, Lsb0) byte and bit
      * ordering.
      *
      * @param src the long to convert
@@ -1263,13 +1261,13 @@ public class Conversion {
         }
         for (int i = 0; i < nInts; i++) {
             final int shift = i * 32 + srcPos;
-            dst[dstPos + i] = (int) (0xffffffff & (src >> shift));
+            dst[dstPos + i] = (int) (0xffffffff & src >> shift);
         }
         return dst;
     }
 
     /**
-     * Converts a long into an array of short using the default (little endian, Lsb0) byte and
+     * Converts a long into an array of short using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the long to convert
@@ -1293,13 +1291,13 @@ public class Conversion {
         }
         for (int i = 0; i < nShorts; i++) {
             final int shift = i * 16 + srcPos;
-            dst[dstPos + i] = (short) (0xffff & (src >> shift));
+            dst[dstPos + i] = (short) (0xffff & src >> shift);
         }
         return dst;
     }
 
     /**
-     * Converts an array of short into an int using the default (little endian, Lsb0) byte and
+     * Converts an array of short into an int using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the short array to convert
@@ -1326,13 +1324,13 @@ public class Conversion {
             final int shift = i * 16 + dstPos;
             final int bits = (0xffff & src[i + srcPos]) << shift;
             final int mask = 0xffff << shift;
-            out = (out & ~mask) | bits;
+            out = out & ~mask | bits;
         }
         return out;
     }
 
     /**
-     * Converts an array of short into a long using the default (little endian, Lsb0) byte and
+     * Converts an array of short into a long using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the short array to convert
@@ -1359,13 +1357,13 @@ public class Conversion {
             final int shift = i * 16 + dstPos;
             final long bits = (0xffffL & src[i + srcPos]) << shift;
             final long mask = 0xffffL << shift;
-            out = (out & ~mask) | bits;
+            out = out & ~mask | bits;
         }
         return out;
     }
 
     /**
-     * Converts a short into an array of boolean using the default (little endian, Lsb0) byte
+     * Converts a short into an array of boolean using the default (little-endian, Lsb0) byte
      * and bit ordering.
      *
      * @param src the short to convert
@@ -1387,16 +1385,16 @@ public class Conversion {
         if (nBools - 1 + srcPos >= 16) {
             throw new IllegalArgumentException("nBools-1+srcPos is greater or equal to than 16");
         }
-        assert (nBools - 1) < 16 - srcPos;
+        assert nBools - 1 < 16 - srcPos;
         for (int i = 0; i < nBools; i++) {
             final int shift = i + srcPos;
-            dst[dstPos + i] = (0x1 & (src >> shift)) != 0;
+            dst[dstPos + i] = (0x1 & src >> shift) != 0;
         }
         return dst;
     }
 
     /**
-     * Converts a short into an array of byte using the default (little endian, Lsb0) byte and
+     * Converts a short into an array of byte using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the short to convert
@@ -1420,13 +1418,13 @@ public class Conversion {
         }
         for (int i = 0; i < nBytes; i++) {
             final int shift = i * 8 + srcPos;
-            dst[dstPos + i] = (byte) (0xff & (src >> shift));
+            dst[dstPos + i] = (byte) (0xff & src >> shift);
         }
         return dst;
     }
 
     /**
-     * Converts a short into an array of Char using the default (little endian, Lsb0) byte and
+     * Converts a short into an array of Char using the default (little-endian, Lsb0) byte and
      * bit ordering.
      *
      * @param src the short to convert
@@ -1451,7 +1449,7 @@ public class Conversion {
         int append = sb.length();
         for (int i = 0; i < nHexs; i++) {
             final int shift = i * 4 + srcPos;
-            final int bits = 0xF & (src >> shift);
+            final int bits = 0xF & src >> shift;
             if (dstPos + i == append) {
                 ++append;
                 sb.append(intToHexDigit(bits));
@@ -1463,7 +1461,7 @@ public class Conversion {
     }
 
     /**
-     * Converts UUID into an array of byte using the default (little endian, Lsb0) byte and bit
+     * Converts UUID into an array of byte using the default (little-endian, Lsb0) byte and bit
      * ordering.
      *
      * @param src the UUID to convert
@@ -1488,5 +1486,15 @@ public class Conversion {
             longToByteArray(src.getLeastSignificantBits(), 0, dst, dstPos + 8, nBytes - 8);
         }
         return dst;
+    }
+
+    /**
+     * Constructs a new instance.
+     *
+     * @deprecated Will be removed in 4.0.0.
+     */
+    @Deprecated
+    public Conversion() {
+        // empty
     }
 }

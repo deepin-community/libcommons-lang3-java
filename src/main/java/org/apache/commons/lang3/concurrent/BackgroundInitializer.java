@@ -97,9 +97,16 @@ public class BackgroundInitializer<T> extends AbstractConcurrentInitializer<T, E
     public static class Builder<I extends BackgroundInitializer<T>, T> extends AbstractBuilder<I, T, Builder<I, T>, Exception> {
 
         /**
-         * The external executor service for executing tasks. null is an permitted value.
+         * The external executor service for executing tasks. null is a permitted value.
          */
         private ExecutorService externalExecutor;
+
+        /**
+         * Constructs a new instance.
+         */
+        public Builder() {
+            // empty
+        }
 
         @SuppressWarnings("unchecked")
         @Override
@@ -108,12 +115,12 @@ public class BackgroundInitializer<T> extends AbstractConcurrentInitializer<T, E
         }
 
         /**
-         * Sets the external executor service for executing tasks. null is an permitted value.
+         * Sets the external executor service for executing tasks. null is a permitted value.
          *
          * @see org.apache.commons.lang3.concurrent.BackgroundInitializer#setExternalExecutor(ExecutorService)
          *
          * @param externalExecutor the {@link ExecutorService} to be used.
-         * @return this
+         * @return {@code this} instance.
          */
         public Builder<I, T> setExternalExecutor(final ExecutorService externalExecutor) {
             this.externalExecutor = externalExecutor;
@@ -318,7 +325,7 @@ public class BackgroundInitializer<T> extends AbstractConcurrentInitializer<T, E
      * {@inheritDoc}
      */
     @Override
-    protected Exception getTypedException(Exception e) {
+    protected Exception getTypedException(final Exception e) {
         //This Exception object will be used for type comparison in AbstractConcurrentInitializer.initialize but not thrown
         return new Exception(e);
     }

@@ -14,7 +14,7 @@ Build-Depends-Indep:
  libeasymock-java (>= 5.0.0),
  libmaven-bundle-plugin-java,
  libmaven-javadoc-plugin-java
-Standards-Version: 4.6.2
+Standards-Version: 4.7.0
 Vcs-Git: https://salsa.debian.org/java-team/libcommons-lang3-java.git
 Vcs-Browser: https://salsa.debian.org/java-team/libcommons-lang3-java
 Homepage: https://commons.apache.org/lang/

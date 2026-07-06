@@ -53,7 +53,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Unit tests for methods of {@link org.apache.commons.lang3.StringUtils}
+ * Unit tests for methods of {@link StringUtils}
  * which been moved to their own test classes.
  */
 @SuppressWarnings("deprecation") // deliberate use of deprecated code
@@ -73,16 +73,16 @@ public class StringUtilsTest extends AbstractLangTest {
         final StringBuilder ntr = new StringBuilder();
         for (int i = 0; i < Character.MAX_VALUE; i++) {
             if (Character.isWhitespace((char) i)) {
-                ws.append(String.valueOf((char) i));
+                ws.append((char) i);
                 if (i > 32) {
-                    ntr.append(String.valueOf((char) i));
+                    ntr.append((char) i);
                 }
             } else if (i < 40) {
-                nws.append(String.valueOf((char) i));
+                nws.append((char) i);
             }
         }
         for (int i = 0; i <= 32; i++) {
-            tr.append(String.valueOf((char) i));
+            tr.append((char) i);
         }
         WHITESPACE = ws.toString();
         NON_WHITESPACE = nws.toString();
@@ -438,7 +438,7 @@ public class StringUtilsTest extends AbstractLangTest {
         assertNull(StringUtils.appendIfMissing(null, null, (CharSequence[]) null), "appendIfMissing(null,null,null)");
         assertEquals("abc", StringUtils.appendIfMissing("abc", null, (CharSequence[]) null), "appendIfMissing(abc,null,null)");
         assertEquals("xyz", StringUtils.appendIfMissing("", "xyz", (CharSequence[]) null), "appendIfMissing(\"\",xyz,null))");
-        assertEquals("abcxyz", StringUtils.appendIfMissing("abc", "xyz", null), "appendIfMissing(abc,xyz,{null})");
+        assertEquals("abcxyz", StringUtils.appendIfMissing("abc", "xyz", (CharSequence) null), "appendIfMissing(abc,xyz,{null})");
         assertEquals("abc", StringUtils.appendIfMissing("abc", "xyz", ""), "appendIfMissing(abc,xyz,\"\")");
         assertEquals("abcxyz", StringUtils.appendIfMissing("abc", "xyz", "mno"), "appendIfMissing(abc,xyz,mno)");
         assertEquals("abcxyz", StringUtils.appendIfMissing("abcxyz", "xyz", "mno"), "appendIfMissing(abcxyz,xyz,mno)");
@@ -462,7 +462,7 @@ public class StringUtilsTest extends AbstractLangTest {
         assertNull(StringUtils.appendIfMissingIgnoreCase(null, null, (CharSequence[]) null), "appendIfMissingIgnoreCase(null,null,null)");
         assertEquals("abc", StringUtils.appendIfMissingIgnoreCase("abc", null, (CharSequence[]) null), "appendIfMissingIgnoreCase(abc,null,null)");
         assertEquals("xyz", StringUtils.appendIfMissingIgnoreCase("", "xyz", (CharSequence[]) null), "appendIfMissingIgnoreCase(\"\",xyz,null)");
-        assertEquals("abcxyz", StringUtils.appendIfMissingIgnoreCase("abc", "xyz", null), "appendIfMissingIgnoreCase(abc,xyz,{null})");
+        assertEquals("abcxyz", StringUtils.appendIfMissingIgnoreCase("abc", "xyz", (CharSequence) null), "appendIfMissingIgnoreCase(abc,xyz,{null})");
         assertEquals("abc", StringUtils.appendIfMissingIgnoreCase("abc", "xyz", ""), "appendIfMissingIgnoreCase(abc,xyz,\"\")");
         assertEquals("abcxyz", StringUtils.appendIfMissingIgnoreCase("abc", "xyz", "mno"), "appendIfMissingIgnoreCase(abc,xyz,mno)");
         assertEquals("abcxyz", StringUtils.appendIfMissingIgnoreCase("abcxyz", "xyz", "mno"), "appendIfMissingIgnoreCase(abcxyz,xyz,mno)");
@@ -676,7 +676,6 @@ public class StringUtilsTest extends AbstractLangTest {
         assertEquals("abc", s);
     }
 
-
     @Test
     public void testDefaultIfEmpty_CharBuffers() {
         assertEquals("NULL", StringUtils.defaultIfEmpty(CharBuffer.wrap(""), CharBuffer.wrap("NULL")).toString());
@@ -696,7 +695,6 @@ public class StringUtilsTest extends AbstractLangTest {
         final StringBuffer s = StringUtils.defaultIfEmpty(new StringBuffer("abc"), new StringBuffer("NULL"));
         assertEquals("abc", s.toString());
     }
-
 
     @Test
     public void testDefaultIfEmpty_StringBuilders() {
@@ -745,7 +743,6 @@ public class StringUtilsTest extends AbstractLangTest {
         assertEquals("", StringUtils.difference("abc", "abc"));
         assertEquals("you are a robot", StringUtils.difference("i am a robot", "you are a robot"));
     }
-
 
     @Test
     public void testDifferenceAt_StringArray() {
@@ -1182,7 +1179,6 @@ public class StringUtilsTest extends AbstractLangTest {
         assertEquals("", StringUtils.join(MIXED_TYPE_LIST, '/', 2, 1));
     }
 
-
     @Test
     public void testJoin_ArrayOfBooleans() {
         assertNull(StringUtils.join((boolean[]) null, COMMA_SEPARATOR_CHAR));
@@ -1371,7 +1367,7 @@ public class StringUtilsTest extends AbstractLangTest {
         assertEquals("", StringUtils.join(EMPTY_STRING_LIST, null));
         assertEquals("", StringUtils.join(EMPTY_STRING_LIST, ""));
 
-        assertEquals("", StringUtils.join(MIXED_STRING_LIST, "", 0, MIXED_STRING_LIST.size()- 1));
+        assertEquals("", StringUtils.join(MIXED_STRING_LIST, "", 0, MIXED_STRING_LIST.size() - 1));
     }
 
     @ParameterizedTest
@@ -1607,7 +1603,7 @@ public class StringUtilsTest extends AbstractLangTest {
         assertNull(StringUtils.prependIfMissing(null, null, (CharSequence[]) null), "prependIfMissing(null,null null)");
         assertEquals("abc", StringUtils.prependIfMissing("abc", null, (CharSequence[]) null), "prependIfMissing(abc,null,null)");
         assertEquals("xyz", StringUtils.prependIfMissing("", "xyz", (CharSequence[]) null), "prependIfMissing(\"\",xyz,null)");
-        assertEquals("xyzabc", StringUtils.prependIfMissing("abc", "xyz", null), "prependIfMissing(abc,xyz,{null})");
+        assertEquals("xyzabc", StringUtils.prependIfMissing("abc", "xyz", (CharSequence) null), "prependIfMissing(abc,xyz,{null})");
         assertEquals("abc", StringUtils.prependIfMissing("abc", "xyz", ""), "prependIfMissing(abc,xyz,\"\")");
         assertEquals("xyzabc", StringUtils.prependIfMissing("abc", "xyz", "mno"), "prependIfMissing(abc,xyz,mno)");
         assertEquals("xyzabc", StringUtils.prependIfMissing("xyzabc", "xyz", "mno"), "prependIfMissing(xyzabc,xyz,mno)");
@@ -1631,7 +1627,7 @@ public class StringUtilsTest extends AbstractLangTest {
         assertNull(StringUtils.prependIfMissingIgnoreCase(null, null, (CharSequence[]) null), "prependIfMissingIgnoreCase(null,null null)");
         assertEquals("abc", StringUtils.prependIfMissingIgnoreCase("abc", null, (CharSequence[]) null), "prependIfMissingIgnoreCase(abc,null,null)");
         assertEquals("xyz", StringUtils.prependIfMissingIgnoreCase("", "xyz", (CharSequence[]) null), "prependIfMissingIgnoreCase(\"\",xyz,null)");
-        assertEquals("xyzabc", StringUtils.prependIfMissingIgnoreCase("abc", "xyz", null), "prependIfMissingIgnoreCase(abc,xyz,{null})");
+        assertEquals("xyzabc", StringUtils.prependIfMissingIgnoreCase("abc", "xyz", (CharSequence) null), "prependIfMissingIgnoreCase(abc,xyz,{null})");
         assertEquals("abc", StringUtils.prependIfMissingIgnoreCase("abc", "xyz", ""), "prependIfMissingIgnoreCase(abc,xyz,\"\")");
         assertEquals("xyzabc", StringUtils.prependIfMissingIgnoreCase("abc", "xyz", "mno"), "prependIfMissingIgnoreCase(abc,xyz,mno)");
         assertEquals("xyzabc", StringUtils.prependIfMissingIgnoreCase("xyzabc", "xyz", "mno"), "prependIfMissingIgnoreCase(xyzabc,xyz,mno)");
@@ -3041,7 +3037,7 @@ public class StringUtilsTest extends AbstractLangTest {
         // sanity check end
         assertEquals(expectedString, StringUtils.toEncodedString(expectedBytes, Charset.defaultCharset()));
         assertEquals(expectedString, StringUtils.toEncodedString(expectedBytes, Charset.forName(encoding)));
-        encoding = "UTF-16";
+        encoding = StandardCharsets.UTF_16.name();
         expectedBytes = expectedString.getBytes(Charset.forName(encoding));
         assertEquals(expectedString, StringUtils.toEncodedString(expectedBytes, Charset.forName(encoding)));
     }
@@ -3101,7 +3097,7 @@ public class StringUtilsTest extends AbstractLangTest {
         // sanity check end
         assertEquals(expectedString, StringUtils.toString(expectedBytes, null));
         assertEquals(expectedString, StringUtils.toString(expectedBytes, SystemUtils.FILE_ENCODING));
-        final String encoding = "UTF-16";
+        final String encoding = StandardCharsets.UTF_16.name();
         expectedBytes = expectedString.getBytes(Charset.forName(encoding));
         assertEquals(expectedString, StringUtils.toString(expectedBytes, encoding));
     }

@@ -272,7 +272,9 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
     /** Current size of the buffer. */
     protected int size; // TODO make private?
 
-    /** The new line. */
+    /**
+     * The new line, {@code null} means use the system default from {@link System#lineSeparator()}.
+     */
     private String newLine;
 
     /** The null text. */
@@ -801,7 +803,6 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
         return this;
     }
 
-
     /**
      * Appends each item in an array to the builder without any separators.
      * Appending a null array will have no effect.
@@ -830,7 +831,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
     /**
      * Appends an object to the builder padding on the left to a fixed width.
      * The {@code String.valueOf} of the {@code int} value is used.
-     * If the formatted value is larger than the length, the left-hand side is lost.
+     * If the formatted value is larger than the length, the left-hand side side is lost.
      *
      * @param value  the value to append
      * @param width  the fixed field width, zero or negative has no effect
@@ -844,7 +845,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
     /**
      * Appends an object to the builder padding on the left to a fixed width.
      * The {@code toString} of the object is used.
-     * If the object is larger than the length, the left-hand side is lost.
+     * If the object is larger than the length, the left-hand side side is lost.
      * If the object is null, the null text value is used.
      *
      * @param obj  the object to append, null uses null text
@@ -877,7 +878,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
     /**
      * Appends an object to the builder padding on the right to a fixed length.
      * The {@code String.valueOf} of the {@code int} value is used.
-     * If the object is larger than the length, the right-hand side is lost.
+     * If the object is larger than the length, the right-hand side side is lost.
      *
      * @param value  the value to append
      * @param width  the fixed field width, zero or negative has no effect
@@ -891,7 +892,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
     /**
      * Appends an object to the builder padding on the right to a fixed length.
      * The {@code toString} of the object is used.
-     * If the object is larger than the length, the right-hand side is lost.
+     * If the object is larger than the length, the right-hand side side is lost.
      * If the object is null, null text value is used.
      *
      * @param obj  the object to append, null uses null text
@@ -1143,14 +1144,18 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
     }
 
     /**
-     * Appends the new line string to this string builder.
+     * Appends this builder's new line string to this builder.
      * <p>
-     * The new line string can be altered using {@link #setNewLineText(String)}.
-     * This might be used to force the output to always use Unix line endings
-     * even when on Windows.
+     * By default, the new line is the system default from {@link System#lineSeparator()}.
+     * </p>
+     * <p>
+     * The new line string can be changed using {@link #setNewLineText(String)}. For example, you can use this to force the output to always use UNIX line
+     * endings even when on Windows.
      * </p>
      *
-     * @return this, to enable chaining
+     * @return {@code this} instance.
+     * @see #getNewLineText()
+     * @see #setNewLineText(String)
      */
     public StrBuilder appendNewLine() {
         if (newLine == null)  {
@@ -1243,10 +1248,11 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
      * This method is useful for adding a separator each time around the
      * loop except the first.
      * </p>
-     * <pre>
-     * for (int i = 0; i &lt; list.size(); i++) {
+     * <pre>{@code
+     * for (int i = 0; i < list.size(); i++) {
      *   appendSeparator(",", i);
      *   append(list.get(i));
+     * }
      * }
      * </pre>
      * Note that for this simple example, you should use
@@ -1299,12 +1305,12 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
      * This method is useful for adding a separator each time around the
      * loop except the first.
      * </p>
-     * <pre>
-     * for (int i = 0; i &lt; list.size(); i++) {
+     * <pre>{@code
+     * for (int i = 0; i < list.size(); i++) {
      *   appendSeparator(",", i);
      *   append(list.get(i));
      * }
-     * </pre>
+     * }</pre>
      * Note that for this simple example, you should use
      * {@link #appendWithSeparators(Iterable, String)}.
      *
@@ -1833,9 +1839,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
      */
     public StrBuilder ensureCapacity(final int capacity) {
         if (capacity > buffer.length) {
-            final char[] old = buffer;
-            buffer = new char[capacity * 2];
-            System.arraycopy(old, 0, buffer, 0, size);
+            buffer = ArrayUtils.arraycopy(buffer, 0, 0, size, () -> new char[capacity * 2]);
         }
         return this;
     }
@@ -1916,8 +1920,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
         if (destination == null || destination.length < len) {
             destination = new char[len];
         }
-        System.arraycopy(buffer, 0, destination, 0, len);
-        return destination;
+        return ArrayUtils.arraycopy(buffer, 0, destination, 0, len);
     }
 
     /**
@@ -1944,9 +1947,9 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
     }
 
     /**
-     * Gets the text to be appended when a new line is added.
+     * Gets the text to be appended when a {@link #appendNewLine() new line} is added.
      *
-     * @return the new line text, null means use system default
+     * @return The new line text, {@code null} means use the system default from {@link System#lineSeparator()}.
      */
     public String getNewLineText() {
         return newLine;
@@ -2470,9 +2473,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
      */
     public StrBuilder minimizeCapacity() {
         if (buffer.length > length()) {
-            final char[] old = buffer;
-            buffer = new char[length()];
-            System.arraycopy(old, 0, buffer, 0, size);
+            buffer = ArrayUtils.arraycopy(buffer, 0, 0, size, () -> new char[length()]);
         }
         return this;
     }
@@ -2817,10 +2818,10 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
     }
 
     /**
-     * Sets the text to be appended when a new line is added.
+     * Sets the text to be appended when {@link #appendNewLine() new line} is called.
      *
-     * @param newLine  the new line text, null means use system default
-     * @return this, to enable chaining
+     * @param newLine the new line text, {@code null} means use the system default from {@link System#lineSeparator()}.
+     * @return {@code this} instance.
      */
     public StrBuilder setNewLineText(final String newLine) {
         this.newLine = newLine;
@@ -2939,9 +2940,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
         if (size == 0) {
             return ArrayUtils.EMPTY_CHAR_ARRAY;
         }
-        final char[] chars = new char[size];
-        System.arraycopy(buffer, 0, chars, 0, size);
-        return chars;
+        return ArrayUtils.arraycopy(buffer, 0, 0, size, char[]::new);
     }
 
     /**
@@ -2960,9 +2959,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
         if (len == 0) {
             return ArrayUtils.EMPTY_CHAR_ARRAY;
         }
-        final char[] chars = new char[len];
-        System.arraycopy(buffer, startIndex, chars, 0, len);
-        return chars;
+        return ArrayUtils.arraycopy(buffer, startIndex, 0, len, char[]::new);
     }
 
     /**

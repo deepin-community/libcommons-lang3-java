@@ -25,8 +25,6 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -48,7 +46,7 @@ import java.util.Objects;
 public class SerializationUtils {
 
     /**
-     * Custom specialization of the standard JDK {@link java.io.ObjectInputStream}
+     * Custom specialization of the standard JDK {@link ObjectInputStream}
      * that uses a custom  {@link ClassLoader} to resolve a class.
      * If the specified {@link ClassLoader} is not able to resolve the class,
      * the context classloader of the current thread will be used.
@@ -60,26 +58,12 @@ public class SerializationUtils {
      * <p>For more in-depth information about the problem for which this
      * class here is a workaround, see the JIRA issue LANG-626.</p>
      */
-     static class ClassLoaderAwareObjectInputStream extends ObjectInputStream {
-        private static final Map<String, Class<?>> primitiveTypes =
-                new HashMap<>();
-
-        static {
-            primitiveTypes.put("byte", byte.class);
-            primitiveTypes.put("short", short.class);
-            primitiveTypes.put("int", int.class);
-            primitiveTypes.put("long", long.class);
-            primitiveTypes.put("float", float.class);
-            primitiveTypes.put("double", double.class);
-            primitiveTypes.put("boolean", boolean.class);
-            primitiveTypes.put("char", char.class);
-            primitiveTypes.put("void", void.class);
-        }
+     static final class ClassLoaderAwareObjectInputStream extends ObjectInputStream {
 
         private final ClassLoader classLoader;
 
         /**
-         * Constructor.
+         * Constructs a new instance.
          * @param in The {@link InputStream}.
          * @param classLoader classloader to use
          * @throws IOException if an I/O error occurs while reading stream header.
@@ -107,7 +91,7 @@ public class SerializationUtils {
                 try {
                     return Class.forName(name, false, Thread.currentThread().getContextClassLoader());
                 } catch (final ClassNotFoundException cnfe) {
-                    final Class<?> cls = primitiveTypes.get(name);
+                    final Class<?> cls = ClassUtils.getPrimitiveClass(name);
                     if (cls != null) {
                         return cls;
                     }
@@ -207,7 +191,7 @@ public class SerializationUtils {
             @SuppressWarnings("unchecked")
             final T obj = (T) in.readObject();
             return obj;
-        } catch (final ClassNotFoundException | IOException ex) {
+        } catch (final ClassNotFoundException | IOException | NegativeArraySizeException ex) {
             throw new SerializationException(ex);
         }
     }
@@ -274,8 +258,12 @@ public class SerializationUtils {
      * <p>This constructor is public to permit tools that require a JavaBean instance
      * to operate.</p>
      * @since 2.0
+     *
+     * @deprecated TODO Make private in 4.0.
      */
+    @Deprecated
     public SerializationUtils() {
+        // empty
     }
 
 }

@@ -92,15 +92,15 @@ public class ClassUtils {
     private static final Map<String, Class<?>> namePrimitiveMap = new HashMap<>();
 
     static {
-        namePrimitiveMap.put("boolean", Boolean.TYPE);
-        namePrimitiveMap.put("byte", Byte.TYPE);
-        namePrimitiveMap.put("char", Character.TYPE);
-        namePrimitiveMap.put("short", Short.TYPE);
-        namePrimitiveMap.put("int", Integer.TYPE);
-        namePrimitiveMap.put("long", Long.TYPE);
-        namePrimitiveMap.put("double", Double.TYPE);
-        namePrimitiveMap.put("float", Float.TYPE);
-        namePrimitiveMap.put("void", Void.TYPE);
+        namePrimitiveMap.put(Boolean.TYPE.getSimpleName(), Boolean.TYPE);
+        namePrimitiveMap.put(Byte.TYPE.getSimpleName(), Byte.TYPE);
+        namePrimitiveMap.put(Character.TYPE.getSimpleName(), Character.TYPE);
+        namePrimitiveMap.put(Double.TYPE.getSimpleName(), Double.TYPE);
+        namePrimitiveMap.put(Float.TYPE.getSimpleName(), Float.TYPE);
+        namePrimitiveMap.put(Integer.TYPE.getSimpleName(), Integer.TYPE);
+        namePrimitiveMap.put(Long.TYPE.getSimpleName(), Long.TYPE);
+        namePrimitiveMap.put(Short.TYPE.getSimpleName(), Short.TYPE);
+        namePrimitiveMap.put(Void.TYPE.getSimpleName(), Void.TYPE);
     }
 
     /**
@@ -528,7 +528,7 @@ public class ClassUtils {
      */
     public static Class<?> getClass(final ClassLoader classLoader, final String className, final boolean initialize) throws ClassNotFoundException {
         try {
-            Class<?> clazz = namePrimitiveMap.get(className);
+            final Class<?> clazz = getPrimitiveClass(className);
             return clazz != null ? clazz : Class.forName(toCanonicalName(className), initialize, classLoader);
         } catch (final ClassNotFoundException ex) {
             // allow path separators (.) as inner class name separators
@@ -751,14 +751,24 @@ public class ClassUtils {
     }
 
     /**
+     * Gets the primitive class for the given class name, for example "byte".
+     *
+     * @param className the primitive class for the given class name.
+     * @return the primitive class.
+     */
+    static Class<?> getPrimitiveClass(final String className) {
+        return namePrimitiveMap.get(className);
+    }
+
+    /**
      * Returns the desired Method much like {@code Class.getMethod}, however it ensures that the returned Method is from a
      * public class or interface and not from an anonymous inner class. This means that the Method is invokable and doesn't
      * fall foul of Java bug <a href="https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4071957">4071957</a>).
      *
      * <pre>
-     *  <code>Set set = Collections.unmodifiableSet(...);
+     *  {@code Set set = Collections.unmodifiableSet(...);
      *  Method method = ClassUtils.getPublicMethod(set.getClass(), "isEmpty",  new Class[0]);
-     *  Object result = method.invoke(set, new Object[]);</code>
+     *  Object result = method.invoke(set, new Object[]);}
      * </pre>
      *
      * @param cls the class to check, not null
@@ -982,7 +992,7 @@ public class ClassUtils {
      *
      * <p>
      * Note that this method differs from {@link #getSimpleName(Class)} in that this will return, for example
-     * {@code "Map.Entry"} whilst the {@code java.lang.Class} variant will simply return {@code "Entry"}. In this example
+     * {@code "Map.Entry"} whilst the {@link Class} variant will simply return {@code "Entry"}. In this example
      * the argument {@code className} is the string {@code java.util.Map$Entry} (note the {@code $} sign.
      * </p>
      *
@@ -1384,12 +1394,8 @@ public class ClassUtils {
         if (!ArrayUtils.isSameLength(classArray, toClassArray)) {
             return false;
         }
-        if (classArray == null) {
-            classArray = ArrayUtils.EMPTY_CLASS_ARRAY;
-        }
-        if (toClassArray == null) {
-            toClassArray = ArrayUtils.EMPTY_CLASS_ARRAY;
-        }
+        classArray = ArrayUtils.nullToEmpty(classArray);
+        toClassArray = ArrayUtils.nullToEmpty(toClassArray);
         for (int i = 0; i < classArray.length; i++) {
             if (!isAssignable(classArray[i], toClassArray[i], autoboxing)) {
                 return false;
@@ -1616,8 +1622,12 @@ public class ClassUtils {
      * <p>
      * This constructor is public to permit tools that require a JavaBean instance to operate.
      * </p>
+     *
+     * @deprecated TODO Make private in 4.0.
      */
+    @Deprecated
     public ClassUtils() {
+        // empty
     }
 
 }

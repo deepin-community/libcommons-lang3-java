@@ -95,7 +95,7 @@ public class MultiBackgroundInitializerTest extends AbstractLangTest {
 
     protected static class CloseableCounter {
         // A convenience for testing that a CloseableCounter typed as Object has a specific initializeCalls value
-        public static CloseableCounter wrapInteger(int i) {
+        public static CloseableCounter wrapInteger(final int i) {
             return new CloseableCounter().setInitializeCalls(i);
         }
 
@@ -130,7 +130,7 @@ public class MultiBackgroundInitializerTest extends AbstractLangTest {
             return closed;
         }
 
-        public CloseableCounter setInitializeCalls(int i) {
+        public CloseableCounter setInitializeCalls(final int i) {
             initializeCalls = i;
             return this;
         }
@@ -431,15 +431,15 @@ public class MultiBackgroundInitializerTest extends AbstractLangTest {
         childOne.enableLatch();
         childTwo.enableLatch();
 
-        assertFalse(initializer.isInitialized(), "Initalized without having anything to initalize");
+        assertFalse(initializer.isInitialized(), "Initialized without having anything to initialize");
 
         initializer.addInitializer("child one", childOne);
         initializer.addInitializer("child two", childTwo);
         initializer.start();
 
-        long startTime = System.currentTimeMillis();
-        long waitTime = 3000;
-        long endTime = startTime + waitTime;
+        final long startTime = System.currentTimeMillis();
+        final long waitTime = 3000;
+        final long endTime = startTime + waitTime;
         //wait for the children to start
         while (! childOne.isStarted() || ! childTwo.isStarted()) {
             if (System.currentTimeMillis() > endTime) {
@@ -448,15 +448,15 @@ public class MultiBackgroundInitializerTest extends AbstractLangTest {
             }
         }
 
-        assertFalse(initializer.isInitialized(), "Initalized with two children running");
+        assertFalse(initializer.isInitialized(), "Initialized with two children running");
 
         childOne.releaseLatch();
         childOne.get(); //ensure this child finishes initializing
-        assertFalse(initializer.isInitialized(), "Initalized with one child running");
+        assertFalse(initializer.isInitialized(), "Initialized with one child running");
 
         childTwo.releaseLatch();
         childTwo.get(); //ensure this child finishes initializing
-        assertTrue(initializer.isInitialized(), "Not initalized with no children running");
+        assertTrue(initializer.isInitialized(), "Not initialized with no children running");
     }
 
     /**

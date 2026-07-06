@@ -45,9 +45,6 @@ public class StringEscapeUtils {
 
     /* ESCAPE TRANSLATORS */
 
-    // TODO: Create a parent class - 'SinglePassTranslator' ?
-    //       It would handle the index checking + length returning,
-    //       and could also have an optimization check method.
     static class CsvEscaper extends CharSequenceTranslator {
 
         private static final char CSV_DELIMITER = ',';
@@ -759,7 +756,6 @@ public class StringEscapeUtils {
         return UNESCAPE_JSON.translate(input);
     }
 
-
     /**
      * Unescapes a string containing XML entity escapes to a string
      * containing the actual Unicode characters corresponding to the
@@ -790,8 +786,12 @@ public class StringEscapeUtils {
      *
      * <p>This constructor is public to permit tools that require a JavaBean
      * instance to operate.</p>
+     *
+     * @deprecated TODO Make private in 4.0.
      */
+    @Deprecated
     public StringEscapeUtils() {
+        // empty
     }
 
 }

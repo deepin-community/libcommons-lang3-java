@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.function.Failable;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.function.FailableFunction;
+import org.apache.commons.lang3.function.Suppliers;
 
 /**
  * Combines the monitor and visitor pattern to work with {@link java.util.concurrent.locks.Lock locked objects}. Locked
@@ -58,22 +59,24 @@ import org.apache.commons.lang3.function.FailableFunction;
  * Example: A thread safe logger class.
  * </p>
  *
- * <pre>
+ * <pre>{@code
  *   public class SimpleLogger {
  *
- *     private final StampedLockVisitor&lt;PrintStream&gt; lock;
+ *     private final StampedLockVisitor<PrintStream> lock;
  *
  *     public SimpleLogger(OutputStream out) {
  *         lock = LockingVisitors.stampedLockVisitor(new PrintStream(out));
  *     }
  *
  *     public void log(String message) {
- *         lock.acceptWriteLocked((ps) -&gt; ps.println(message));
+ *         lock.acceptWriteLocked(ps -> ps.println(message));
  *     }
  *
  *     public void log(byte[] buffer) {
- *         lock.acceptWriteLocked((ps) -&gt; { ps.write(buffer); ps.println(); });
+ *         lock.acceptWriteLocked(ps -> { ps.write(buffer); ps.println(); });
  *     }
+ * }
+ * }
  * </pre>
  *
  * @since 3.11
@@ -183,12 +186,13 @@ public class LockingVisitors {
          * <em>Example:</em> Consider that the hidden object is a list, and we wish to know the current size of the
          * list. This might be achieved with the following:
          * </p>
-         * <pre>
-         * private Lock&lt;List&lt;Object&gt;&gt; listLock;
+         * <pre>{@code
+         * private Lock<List<Object>> listLock;
          *
          * public int getCurrentListSize() {
-         *     final Integer sizeInteger = listLock.applyReadLocked((list) -&gt; Integer.valueOf(list.size));
+         *     final Integer sizeInteger = listLock.applyReadLocked(list -> Integer.valueOf(list.size));
          *     return sizeInteger.intValue();
+         * }
          * }
          * </pre>
          *
@@ -262,10 +266,12 @@ public class LockingVisitors {
          * @see #acceptWriteLocked(FailableConsumer)
          */
         protected void lockAcceptUnlock(final Supplier<Lock> lockSupplier, final FailableConsumer<O, ?> consumer) {
-            final Lock lock = lockSupplier.get();
+            final Lock lock = Objects.requireNonNull(Suppliers.get(lockSupplier), "lock");
             lock.lock();
             try {
-                consumer.accept(object);
+                if (consumer != null) {
+                    consumer.accept(object);
+                }
             } catch (final Throwable t) {
                 throw Failable.rethrow(t);
             } finally {
@@ -289,7 +295,7 @@ public class LockingVisitors {
          * @see #applyWriteLocked(FailableFunction)
          */
         protected <T> T lockApplyUnlock(final Supplier<Lock> lockSupplier, final FailableFunction<O, T, ?> function) {
-            final Lock lock = lockSupplier.get();
+            final Lock lock = Objects.requireNonNull(Suppliers.get(lockSupplier), "lock");
             lock.lock();
             try {
                 return function.apply(object);
@@ -383,4 +389,13 @@ public class LockingVisitors {
         return new LockingVisitors.StampedLockVisitor<>(object, new StampedLock());
     }
 
+    /**
+     * Make private in 4.0.
+     *
+     * @deprecated TODO Make private in 4.0.
+     */
+    @Deprecated
+    public LockingVisitors() {
+        // empty
+    }
 }

@@ -28,6 +28,9 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.AbstractLangTest;
 import org.junit.jupiter.api.Test;
@@ -93,6 +96,89 @@ public class NumberUtilsTest extends AbstractLangTest {
         assertTrue(NumberUtils.compare((short) -3, (short) 0) < 0);
         assertEquals(0, NumberUtils.compare((short) 113, (short) 113));
         assertTrue(NumberUtils.compare((short) 213, (short) 32) > 0);
+    }
+
+    private boolean isApplyNonNull(final String s, final Function<String, ?> function) {
+        try {
+            assertNotNull(function.apply(s));
+            return true;
+        } catch (final Exception e) {
+            if (!s.matches(".*\\s.*")) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
+
+    private boolean isNumberFormatParsable(final String s) {
+        final NumberFormat instance = NumberFormat.getInstance();
+        try {
+            // Stops parsing when a space is found, then returns an object.
+            assertNotNull(instance.parse(s));
+            return true;
+        } catch (final ParseException e) {
+            return false;
+        }
+    }
+
+    private boolean isNumberIntegerOnlyFormatParsable(final String s) {
+        final NumberFormat instance = NumberFormat.getInstance();
+        instance.setParseIntegerOnly(true);
+        try {
+            // Stops parsing when a space is found, then returns an object.
+            assertNotNull(instance.parse(s));
+            return true;
+        } catch (final ParseException e) {
+            return false;
+        }
+    }
+
+    private boolean isParsableByte(final String s) {
+        final boolean parsable = NumberUtils.isParsable(s);
+        assertTrue(isNumberFormatParsable(s), s);
+        assertTrue(isNumberIntegerOnlyFormatParsable(s), s);
+        assertEquals(parsable, isApplyNonNull(s, Byte::parseByte), s);
+        return parsable;
+    }
+
+    private boolean isParsableDouble(final String s) {
+        final boolean parsable = NumberUtils.isParsable(s);
+        assertTrue(isNumberFormatParsable(s), s);
+        assertTrue(isNumberIntegerOnlyFormatParsable(s), s);
+        assertEquals(parsable, isApplyNonNull(s, Double::parseDouble), s);
+        return parsable;
+    }
+
+    private boolean isParsableFloat(final String s) {
+        final boolean parsable = NumberUtils.isParsable(s);
+        assertTrue(isNumberFormatParsable(s), s);
+        assertTrue(isNumberIntegerOnlyFormatParsable(s), s);
+        assertEquals(parsable, isApplyNonNull(s, Float::parseFloat), s);
+        return parsable;
+    }
+
+    private boolean isParsableInteger(final String s) {
+        final boolean parsable = NumberUtils.isParsable(s);
+        assertTrue(isNumberFormatParsable(s), s);
+        assertTrue(isNumberIntegerOnlyFormatParsable(s), s);
+        assertEquals(parsable, isApplyNonNull(s, Integer::parseInt), s);
+        return parsable;
+    }
+
+    private boolean isParsableLong(final String s) {
+        final boolean parsable = NumberUtils.isParsable(s);
+        assertTrue(isNumberFormatParsable(s), s);
+        assertTrue(isNumberIntegerOnlyFormatParsable(s), s);
+        assertEquals(parsable, isApplyNonNull(s, Long::parseLong), s);
+        return parsable;
+    }
+
+    private boolean isParsableShort(final String s) {
+        final boolean parsable = NumberUtils.isParsable(s);
+        assertTrue(isNumberFormatParsable(s), s);
+        assertTrue(isNumberIntegerOnlyFormatParsable(s), s);
+        assertEquals(parsable, isApplyNonNull(s, Short::parseShort), s);
+        return parsable;
     }
 
     /**
@@ -644,9 +730,9 @@ public class NumberUtilsTest extends AbstractLangTest {
         assertEquals(new BigDecimal("1.7976931348623159e+308"), NumberUtils.createNumber("1.7976931348623159e+308"));
 
         // Requested type is parsed as zero but the value is not zero
-        final Double nonZero1 = Double.valueOf(((double) Float.MIN_VALUE) / 2);
+        final Double nonZero1 = Double.valueOf((double) Float.MIN_VALUE / 2);
         assertEquals(nonZero1, NumberUtils.createNumber(nonZero1.toString()));
-        assertEquals(nonZero1, NumberUtils.createNumber(nonZero1.toString() + "F"));
+        assertEquals(nonZero1, NumberUtils.createNumber(nonZero1 + "F"));
         // Smallest double is 4.9e-324.
         // Test a number with zero before and/or after the decimal place to hit edge cases.
         final BigDecimal nonZero2 = new BigDecimal("4.9e-325");
@@ -719,6 +805,12 @@ public class NumberUtilsTest extends AbstractLangTest {
                 assertCreateNumberZero(number + "D", d0, dn0);
             }
         }
+    }
+
+    @Test
+    public void testInvalidNumber() {
+        assertThrows(NumberFormatException.class, () -> NumberUtils.createNumber("E123e.3"));
+        assertThrows(NumberFormatException.class, () -> NumberUtils.createNumber("-"));
     }
 
     /**
@@ -949,6 +1041,56 @@ public class NumberUtilsTest extends AbstractLangTest {
     public void testLANG1252() {
         compareIsCreatableWithCreateNumber("+2", true);
         compareIsCreatableWithCreateNumber("+2.0", true);
+    }
+
+    @Test
+    public void testLang1729IsParsableByte() {
+        assertTrue(isParsableByte("1"));
+        assertFalse(isParsableByte("1 2 3"));
+        assertTrue(isParsableByte("１２３"));
+        assertFalse(isParsableByte("１ ２ ３"));
+    }
+
+    @Test
+    public void testLang1729IsParsableDouble() {
+        assertTrue(isParsableDouble("1"));
+        assertFalse(isParsableDouble("1 2 3"));
+        // TODO Expected to be fixed in Java 23
+        // assertTrue(isParsableDouble("１２３"));
+        assertFalse(isParsableDouble("１ ２ ３"));
+    }
+
+    @Test
+    public void testLang1729IsParsableFloat() {
+        assertTrue(isParsableFloat("1"));
+        assertFalse(isParsableFloat("1 2 3"));
+        // TODO Expected to be fixed in Java 23
+        // assertTrue(isParsableFloat("１２３"));
+        assertFalse(isParsableFloat("１ ２ ３"));
+    }
+
+    @Test
+    public void testLang1729IsParsableInteger() {
+        assertTrue(isParsableInteger("1"));
+        assertFalse(isParsableInteger("1 2 3"));
+        assertTrue(isParsableInteger("１２３"));
+        assertFalse(isParsableInteger("１ ２ ３"));
+    }
+
+    @Test
+    public void testLang1729IsParsableLong() {
+        assertTrue(isParsableLong("1"));
+        assertFalse(isParsableLong("1 2 3"));
+        assertTrue(isParsableLong("１２３"));
+        assertFalse(isParsableLong("１ ２ ３"));
+    }
+
+    @Test
+    public void testLang1729IsParsableShort() {
+        assertTrue(isParsableShort("1"));
+        assertFalse(isParsableShort("1 2 3"));
+        assertTrue(isParsableShort("１２３"));
+        assertFalse(isParsableShort("１ ２ ３"));
     }
 
     @Test
@@ -1409,12 +1551,9 @@ public class NumberUtilsTest extends AbstractLangTest {
      */
     @Test
     public void testStringCreateNumberEnsureNoPrecisionLoss() {
-        final String shouldBeFloat = "1.23";
-        final String shouldBeDouble = "3.40282354e+38";
-        final String shouldBeBigDecimal = "1.797693134862315759e+308";
-        assertTrue(NumberUtils.createNumber(shouldBeFloat) instanceof Float);
-        assertTrue(NumberUtils.createNumber(shouldBeDouble) instanceof Double);
-        assertTrue(NumberUtils.createNumber(shouldBeBigDecimal) instanceof BigDecimal);
+        assertTrue(NumberUtils.createNumber("1.23") instanceof Float);
+        assertTrue(NumberUtils.createNumber("3.40282354e+38") instanceof Double);
+        assertTrue(NumberUtils.createNumber("1.797693134862315759e+308") instanceof BigDecimal);
         // LANG-1060
         assertTrue(NumberUtils.createNumber("001.12") instanceof Float);
         assertTrue(NumberUtils.createNumber("-001.12") instanceof Float);
@@ -1426,15 +1565,15 @@ public class NumberUtilsTest extends AbstractLangTest {
         assertTrue(NumberUtils.createNumber("-001.797693134862315759e+308") instanceof BigDecimal);
         assertTrue(NumberUtils.createNumber("+001.797693134862315759e+308") instanceof BigDecimal);
         //LANG-1613
-        assertTrue(NumberUtils.createNumber(Double.toString(Double.MIN_NORMAL)) instanceof Double);
-        assertTrue(NumberUtils.createNumber(Double.toString(Double.MIN_NORMAL) + "D") instanceof Double);
-        assertTrue(NumberUtils.createNumber(Double.toString(Double.MIN_NORMAL) + "F") instanceof Double);
-        assertTrue(NumberUtils.createNumber(Double.toString(Double.MIN_VALUE)) instanceof Double);
-        assertTrue(NumberUtils.createNumber(Double.toString(Double.MIN_VALUE) + "D") instanceof Double);
-        assertTrue(NumberUtils.createNumber(Double.toString(Double.MIN_VALUE) + "F") instanceof Double);
-        assertTrue(NumberUtils.createNumber(Double.toString(Double.MAX_VALUE)) instanceof Double);
-        assertTrue(NumberUtils.createNumber(Double.toString(Double.MAX_VALUE) + "D") instanceof Double);
-        assertTrue(NumberUtils.createNumber(Double.toString(Double.MAX_VALUE) + "F") instanceof Double);
+        assertTrue(NumberUtils.createNumber("2.2250738585072014E-308") instanceof Double);
+        assertTrue(NumberUtils.createNumber("2.2250738585072014E-308D") instanceof Double);
+        assertTrue(NumberUtils.createNumber("2.2250738585072014E-308F") instanceof Double);
+        assertTrue(NumberUtils.createNumber("4.9E-324") instanceof Double);
+        assertTrue(NumberUtils.createNumber("4.9E-324D") instanceof Double);
+        assertTrue(NumberUtils.createNumber("4.9E-324F") instanceof Double);
+        assertTrue(NumberUtils.createNumber("1.7976931348623157E308") instanceof Double);
+        assertTrue(NumberUtils.createNumber("1.7976931348623157E308D") instanceof Double);
+        assertTrue(NumberUtils.createNumber("1.7976931348623157E308F") instanceof Double);
         assertTrue(NumberUtils.createNumber("4.9e-324D") instanceof Double);
         assertTrue(NumberUtils.createNumber("4.9e-324F") instanceof Double);
     }
@@ -1473,6 +1612,8 @@ public class NumberUtilsTest extends AbstractLangTest {
         assertEquals(NumberUtils.toDouble("-001.2345", 5.1d), -1.2345d, "toDouble(String, int) 4 failed");
         assertEquals(1.2345d, NumberUtils.toDouble("+001.2345", 5.1d), "toDouble(String, int) 5 failed");
         assertEquals(0d, NumberUtils.toDouble("000.00", 5.1d), "toDouble(String, int) 7 failed");
+        assertEquals(5.1d, NumberUtils.toDouble("", 5.1d));
+        assertEquals(5.1d, NumberUtils.toDouble((String) null, 5.1d));
     }
 
     /**
@@ -1493,6 +1634,8 @@ public class NumberUtilsTest extends AbstractLangTest {
     public void testToByteStringI() {
         assertEquals(123, NumberUtils.toByte("123", (byte) 5), "toByte(String, byte) 1 failed");
         assertEquals(5, NumberUtils.toByte("12.3", (byte) 5), "toByte(String, byte) 2 failed");
+        assertEquals(5, NumberUtils.toByte("", (byte) 5));
+        assertEquals(5, NumberUtils.toByte(null, (byte) 5));
     }
 
     /**
@@ -1526,6 +1669,8 @@ public class NumberUtilsTest extends AbstractLangTest {
         assertEquals(5.0f, NumberUtils.toFloat("-001Z.2345", 5.0f), "toFloat(String, int) 3 failed");
         assertEquals(5.0f, NumberUtils.toFloat("+001AB.2345", 5.0f), "toFloat(String, int) 4 failed");
         assertEquals(5.0f, NumberUtils.toFloat("001Z.2345", 5.0f), "toFloat(String, int) 5 failed");
+        assertEquals(5.0f, NumberUtils.toFloat("", 5.0f));
+        assertEquals(5.0f, NumberUtils.toFloat(null, 5.0f));
     }
 
     /**
@@ -1546,6 +1691,8 @@ public class NumberUtilsTest extends AbstractLangTest {
     public void testToIntStringI() {
         assertEquals(12345, NumberUtils.toInt("12345", 5), "toInt(String, int) 1 failed");
         assertEquals(5, NumberUtils.toInt("1234.5", 5), "toInt(String, int) 2 failed");
+        assertEquals(5, NumberUtils.toInt("", 5));
+        assertEquals(5, NumberUtils.toInt(null, 5));
     }
 
     /**
@@ -1570,6 +1717,8 @@ public class NumberUtilsTest extends AbstractLangTest {
     public void testToLongStringL() {
         assertEquals(12345L, NumberUtils.toLong("12345", 5L), "toLong(String, long) 1 failed");
         assertEquals(5L, NumberUtils.toLong("1234.5", 5L), "toLong(String, long) 2 failed");
+        assertEquals(5L, NumberUtils.toLong("", 5L));
+        assertEquals(5L, NumberUtils.toLong(null, 5L));
     }
 
     /**
@@ -1684,7 +1833,7 @@ public class NumberUtilsTest extends AbstractLangTest {
         assertEquals("23521.0000", NumberUtils.toScaledBigDecimal(Float.valueOf(23.521f), 4, RoundingMode.HALF_EVEN)
             .multiply(BigDecimal.valueOf(1000)).toString(), "toScaledBigDecimal(Float, int, RoundingMode) 4 failed");
         assertEquals(NumberUtils.toScaledBigDecimal((Float) null, 2, RoundingMode.HALF_UP), BigDecimal.ZERO,
-            "toScaledBigDecimal(Float, int, RoundingMode) 5 failed");
+                "toScaledBigDecimal(Float, int, RoundingMode) 5 failed");
     }
 
     /**
@@ -1702,7 +1851,7 @@ public class NumberUtilsTest extends AbstractLangTest {
         assertEquals("2352.00", NumberUtils.toScaledBigDecimal("23.525").multiply(BigDecimal.valueOf(100)).toString(),
             "toScaledBigDecimal(String) 4 failed");
         assertEquals(NumberUtils.toScaledBigDecimal((String) null), BigDecimal.ZERO,
-            "toScaledBigDecimal(String) 5 failed");
+                "toScaledBigDecimal(String) 5 failed");
     }
 
     /**
@@ -1721,7 +1870,7 @@ public class NumberUtilsTest extends AbstractLangTest {
                 .multiply(BigDecimal.valueOf(1000)).toString(),
             "toScaledBigDecimal(String, int, RoundingMode) 4 failed");
         assertEquals(NumberUtils.toScaledBigDecimal((String) null, 2, RoundingMode.HALF_UP), BigDecimal.ZERO,
-            "toScaledBigDecimal(String, int, RoundingMode) 5 failed");
+                "toScaledBigDecimal(String, int, RoundingMode) 5 failed");
     }
 
     /**
@@ -1742,5 +1891,7 @@ public class NumberUtilsTest extends AbstractLangTest {
     public void testToShortStringI() {
         assertEquals(12345, NumberUtils.toShort("12345", (short) 5), "toShort(String, short) 1 failed");
         assertEquals(5, NumberUtils.toShort("1234.5", (short) 5), "toShort(String, short) 2 failed");
+        assertEquals(5, NumberUtils.toShort("", (short) 5));
+        assertEquals(5, NumberUtils.toShort(null, (short) 5));
     }
 }

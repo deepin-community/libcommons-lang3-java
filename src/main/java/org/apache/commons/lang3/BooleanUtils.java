@@ -136,6 +136,7 @@ public class BooleanUtils {
 
     /**
      * Returns a new array of possible values (like an enum would).
+     *
      * @return a new array of possible values (like an enum would).
      * @since 3.12.0
      */
@@ -189,7 +190,7 @@ public class BooleanUtils {
     }
 
     /**
-     * Checks if a {@link Boolean} value is <i>not</i> {@code false},
+     * Checks if a {@link Boolean} value is <em>not</em> {@code false},
      * handling {@code null} by returning {@code true}.
      *
      * <pre>
@@ -207,7 +208,7 @@ public class BooleanUtils {
     }
 
     /**
-     * Checks if a {@link Boolean} value is <i>not</i> {@code true},
+     * Checks if a {@link Boolean} value is <em>not</em> {@code true},
      * handling {@code null} by returning {@code true}.
      *
      * <pre>
@@ -478,7 +479,7 @@ public class BooleanUtils {
     }
 
     /**
-     * Converts a String to a boolean (optimised for performance).
+     * Converts a String to a boolean (optimized for performance).
      *
      * <p>{@code 'true'}, {@code 'on'}, {@code 'y'}, {@code 't'} or {@code 'yes'}
      * (case insensitive) will return {@code true}. Otherwise,
@@ -959,7 +960,7 @@ public class BooleanUtils {
     }
 
     /**
-     * Converts a Boolean to a Integer using the convention that
+     * Converts a Boolean to an Integer using the convention that
      * {@code zero} is {@code false}.
      *
      * <p>{@code null} will be converted to {@code null}.</p>
@@ -1212,8 +1213,12 @@ public class BooleanUtils {
      *
      * <p>This constructor is public to permit tools that require a JavaBean instance
      * to operate.</p>
+     *
+     * @deprecated TODO Make private in 4.0.
      */
+    @Deprecated
     public BooleanUtils() {
+        // empty
     }
 
 }

@@ -1,3 +1,19 @@
+libcommons-lang3-java (3.17.0-1+deb13u1) trixie; urgency=medium
+
+  * Team upload.
+  * d/patches/CVE-2025-48924.patch: Add patch to fix CVE-2025-48924.
+    - Fix an uncontrolled recursion vulnerability (closes: 1109125).
+
+ -- Daniel Leidert <dleidert@debian.org>  Sun, 31 Aug 2025 21:12:11 +0200
+
+libcommons-lang3-java (3.17.0-1) unstable; urgency=medium
+
+  * New upstream release
+    - Refreshed the patches
+  * Standards-Version updated to 4.7.0
+
+ -- Emmanuel Bourg <ebourg@apache.org>  Fri, 25 Oct 2024 08:45:03 +0200
+
 libcommons-lang3-java (3.14.0-1) unstable; urgency=medium
 
   * New upstream release

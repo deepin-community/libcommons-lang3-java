@@ -68,7 +68,7 @@ import org.apache.commons.lang3.stream.Streams;
  * <li>{@link #getValue(java.lang.reflect.Field)}</li>
  * </ul>
  * <p>
- * For example, this method does <i>not</i> include the {@code password} field in the returned {@link String}:
+ * For example, this method does <em>not</em> include the {@code password} field in the returned {@link String}:
  * </p>
  * <pre>
  * public String toString() {
@@ -296,7 +296,7 @@ public class ReflectionToStringBuilder extends ToStringBuilder {
      *
      * <p>
      * Superclass fields will be appended up to and including the specified superclass. A null superclass is treated as
-     * {@code java.lang.Object}.
+     * {@link Object}.
      * </p>
      *
      * <p>
@@ -353,7 +353,7 @@ public class ReflectionToStringBuilder extends ToStringBuilder {
      *
      * <p>
      * Superclass fields will be appended up to and including the specified superclass. A null superclass is treated as
-     * {@code java.lang.Object}.
+     * {@link Object}.
      * </p>
      *
      * <p>
@@ -412,7 +412,6 @@ public class ReflectionToStringBuilder extends ToStringBuilder {
     public static String toStringExclude(final Object object, final String... excludeFieldNames) {
         return new ReflectionToStringBuilder(object).setExcludeFieldNames(excludeFieldNames).toString();
     }
-
 
     /**
      * Builds a String for a toString method including the given field names.
@@ -747,7 +746,7 @@ public class ReflectionToStringBuilder extends ToStringBuilder {
      *
      * @param array
      *            the array to add to the {@code toString}
-     * @return this
+     * @return {@code this} instance.
      */
     public ReflectionToStringBuilder reflectionAppendArray(final Object array) {
         this.getStyle().reflectionAppendArrayDetail(this.getStringBuffer(), null, array);

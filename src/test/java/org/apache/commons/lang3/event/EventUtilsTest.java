@@ -40,7 +40,6 @@ import org.apache.commons.lang3.AbstractLangTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * @since 3.0
  */
 public class EventUtilsTest extends AbstractLangTest {
     public static class EventCounter {
@@ -113,7 +112,6 @@ public class EventUtilsTest extends AbstractLangTest {
         }
     }
 
-
     public static class PropertyChangeSource {
         private final EventListenerSupport<PropertyChangeListener> listeners = EventListenerSupport.create(PropertyChangeListener.class);
 
@@ -137,7 +135,6 @@ public class EventUtilsTest extends AbstractLangTest {
             listeners.fire().propertyChange(new PropertyChangeEvent(this, "property", oldValue, property));
         }
     }
-
 
     @Test
     public void testAddEventListener() {
@@ -166,10 +163,10 @@ public class EventUtilsTest extends AbstractLangTest {
         final PropertyChangeSource src = new PropertyChangeSource();
         final EventCountingInvocationHandler handler = new EventCountingInvocationHandler();
         final ObjectChangeListener listener = handler.createListener(ObjectChangeListener.class);
-        final IllegalArgumentException e =
-                assertThrows(IllegalArgumentException.class, () -> EventUtils.addEventListener(src, ObjectChangeListener.class, listener));
-        assertEquals("Class " + src.getClass().getName() + " does not have a public add" + ObjectChangeListener.class.getSimpleName() + " method which takes a parameter of type " + ObjectChangeListener.class.getName() + ".",
-                e.getMessage());
+        final IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> EventUtils.addEventListener(src, ObjectChangeListener.class, listener));
+        assertEquals("Unable to add listener for class " + src.getClass().getName() + " and public add" + ObjectChangeListener.class.getSimpleName()
+                + " method which takes a parameter of type " + ObjectChangeListener.class.getName() + ".", e.getMessage());
     }
 
     @Test
@@ -177,12 +174,11 @@ public class EventUtilsTest extends AbstractLangTest {
         final PropertyChangeSource src = new PropertyChangeSource();
         final EventCountingInvocationHandler handler = new EventCountingInvocationHandler();
         final VetoableChangeListener listener = handler.createListener(VetoableChangeListener.class);
-        final IllegalArgumentException e =
-                assertThrows(IllegalArgumentException.class, () -> EventUtils.addEventListener(src, VetoableChangeListener.class, listener));
-        assertEquals("Class " + src.getClass().getName() + " does not have a public add" + VetoableChangeListener.class.getSimpleName() + " method which takes a parameter of type " + VetoableChangeListener.class.getName() + ".",
-                e.getMessage());
+        final IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> EventUtils.addEventListener(src, VetoableChangeListener.class, listener));
+        assertEquals("Unable to add listener for class " + src.getClass().getName() + " and public add" + VetoableChangeListener.class.getSimpleName()
+                + " method which takes a parameter of type " + VetoableChangeListener.class.getName() + ".", e.getMessage());
     }
-
 
     @Test
     public void testBindEventsToMethod() {
