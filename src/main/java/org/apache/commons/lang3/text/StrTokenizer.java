@@ -38,23 +38,23 @@ import org.apache.commons.lang3.StringUtils;
  * like {@link StringTokenizer}.
  * </p>
  * <p>
- * The input String is split into a number of <i>tokens</i>.
- * Each token is separated from the next String by a <i>delimiter</i>.
+ * The input String is split into a number of <em>tokens</em>.
+ * Each token is separated from the next String by a <em>delimiter</em>.
  * One or more delimiter characters must be specified.
  * </p>
  * <p>
  * Each token may be surrounded by quotes.
- * The <i>quote</i> matcher specifies the quote character(s).
+ * The <em>quote</em> matcher specifies the quote character(s).
  * A quote may be escaped within a quoted section by duplicating itself.
  * </p>
  * <p>
  * Between each token and the delimiter are potentially characters that need trimming.
- * The <i>trimmer</i> matcher specifies these characters.
+ * The <em>trimmer</em> matcher specifies these characters.
  * One usage might be to trim whitespace characters.
  * </p>
  * <p>
  * At any point outside the quotes there might potentially be invalid characters.
- * The <i>ignored</i> matcher specifies these characters to be removed.
+ * The <em>ignored</em> matcher specifies these characters to be removed.
  * One usage might be to remove new line characters.
  * </p>
  * <p>
@@ -214,7 +214,6 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
     /** The text to work on. */
     private char[] chars;
 
-
     /** The parsed tokens */
     private String[] tokens;
 
@@ -229,7 +228,6 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
 
     /** The ignored matcher */
     private StrMatcher ignoredMatcher = StrMatcher.noneMatcher();
-
 
     /** The trimmer matcher */
     private StrMatcher trimmerMatcher = StrMatcher.noneMatcher();

@@ -71,6 +71,7 @@ public class MethodUtilsTest extends AbstractLangTest {
     }
 
     private static final class GetMatchingMethodClass {
+
         public void testMethod() {
         }
 
@@ -379,7 +380,7 @@ public class MethodUtilsTest extends AbstractLangTest {
         }
 
         // These varOverloadEcho and varOverloadEchoStatic methods are designed to verify that
-        // not only is the correct overloaded variant invoked, but that the varags arguments
+        // not only is the correct overloaded variant invoked, but that the varargs arguments
         // are also delivered correctly to the method.
         public ImmutablePair<String, Object[]> varOverloadEcho(final String... args) {
             return new ImmutablePair<>("String...", args);
@@ -683,6 +684,13 @@ public class MethodUtilsTest extends AbstractLangTest {
 
         assertThrows(NullPointerException.class,
                 () -> MethodUtils.getMatchingMethod(null, "testMethod5", RuntimeException.class));
+    }
+
+    @Test
+    public void testGetMethodObject() throws Exception {
+        assertEquals(MutableObject.class.getMethod("getValue", ArrayUtils.EMPTY_CLASS_ARRAY),
+                MethodUtils.getMethodObject(MutableObject.class, "getValue", ArrayUtils.EMPTY_CLASS_ARRAY));
+        assertNull(MethodUtils.getMethodObject(MutableObject.class, "does not exist, at all", ArrayUtils.EMPTY_CLASS_ARRAY));
     }
 
     @Test

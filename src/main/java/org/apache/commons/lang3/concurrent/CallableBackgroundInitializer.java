@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutorService;
  * {@link Callable} is executed in the background thread.
  * </p>
  * <p>
- * The {@code java.util.concurrent.Callable} interface is a standard mechanism
+ * The {@link java.util.concurrent.Callable} interface is a standard mechanism
  * of the JDK to define tasks to be executed by another thread. The {@code
  * CallableBackgroundInitializer} class allows combining this standard interface
  * with the background initializer API.
@@ -47,17 +47,18 @@ import java.util.concurrent.ExecutorService;
  * typical usage example:
  * </p>
  *
- * <pre>
+ * <pre>{@code
  * // a Callable that performs a complex computation
- * Callable&lt;Integer&gt; computationCallable = new MyComputationCallable();
+ * Callable<Integer> computationCallable = new MyComputationCallable();
  * // setup the background initializer
- * CallableBackgroundInitializer&lt;Integer&gt; initializer =
+ * CallableBackgroundInitializer<Integer> initializer =
  *     new CallableBackgroundInitializer(computationCallable);
  * initializer.start();
  * // Now do some other things. Initialization runs in a parallel thread
  * ...
  * // Wait for the end of initialization and access the result
  * Integer result = initializer.get();
+ * }
  * </pre>
  *
  * @since 3.0
@@ -111,7 +112,7 @@ public class CallableBackgroundInitializer<T> extends BackgroundInitializer<T> {
      * {@inheritDoc}
      */
     @Override
-    protected Exception getTypedException(Exception e) {
+    protected Exception getTypedException(final Exception e) {
         //This Exception object will be used for type comparison in AbstractConcurrentInitializer.initialize but not thrown
         return new Exception(e);
     }

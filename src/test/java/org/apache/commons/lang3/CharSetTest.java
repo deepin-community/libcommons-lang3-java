@@ -30,7 +30,7 @@ import java.lang.reflect.Modifier;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests {@link org.apache.commons.lang3.CharSet}.
+ * Unit tests {@link CharSet}.
  */
 public class CharSetTest extends AbstractLangTest {
 
@@ -401,9 +401,9 @@ public class CharSetTest extends AbstractLangTest {
     @Test
     public void testGetInstance_Stringarray() {
         assertNull(CharSet.getInstance((String[]) null));
-        assertEquals("[]", CharSet.getInstance(new String[0]).toString());
+        assertEquals("[]", CharSet.getInstance().toString());
         assertEquals("[]", CharSet.getInstance(new String[] {null}).toString());
-        assertEquals("[a-e]", CharSet.getInstance(new String[] {"a-e"}).toString());
+        assertEquals("[a-e]", CharSet.getInstance("a-e").toString());
     }
 
     @Test

@@ -257,8 +257,7 @@ public class ConstructorUtils {
         parameterTypes = ArrayUtils.nullToEmpty(parameterTypes);
         final Constructor<T> ctor = getAccessibleConstructor(cls, parameterTypes);
         if (ctor == null) {
-            throw new NoSuchMethodException(
-                "No such accessible constructor on object: "+ cls.getName());
+            throw new NoSuchMethodException("No such accessible constructor on object: " + cls.getName());
         }
         return ctor.newInstance(args);
     }
@@ -288,8 +287,12 @@ public class ConstructorUtils {
      *
      * <p>This constructor is {@code public} to permit tools that require a JavaBean
      * instance to operate.</p>
+     *
+     * @deprecated TODO Make private in 4.0.
      */
+    @Deprecated
     public ConstructorUtils() {
+        // empty
     }
 
 }

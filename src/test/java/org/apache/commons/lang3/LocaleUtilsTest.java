@@ -31,7 +31,6 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -71,11 +70,9 @@ public class LocaleUtilsTest extends AbstractLangTest {
         assertSame(list, list2);
         //search through languages
         for (final String country : countries) {
-            final Iterator<Locale> iterator = list.iterator();
             boolean found = false;
             // see if it was returned by the set
-            while (iterator.hasNext()) {
-                final Locale locale = iterator.next();
+            for (Locale locale : list) {
                 // should have an en empty variant
                 assertTrue(StringUtils.isEmpty(locale.getVariant()));
                 assertEquals(language, locale.getLanguage());
@@ -105,11 +102,9 @@ public class LocaleUtilsTest extends AbstractLangTest {
         assertSame(list, list2);
         //search through languages
         for (final String language : languages) {
-            final Iterator<Locale> iterator = list.iterator();
             boolean found = false;
             // see if it was returned by the set
-            while (iterator.hasNext()) {
-                final Locale locale = iterator.next();
+            for (Locale locale : list) {
                 // should have an en empty variant
                 assertTrue(StringUtils.isEmpty(locale.getVariant()));
                 assertEquals(country, locale.getCountry());
@@ -458,7 +453,6 @@ public class LocaleUtilsTest extends AbstractLangTest {
 
     /**
      * Test for 3-chars locale, further details at LANG-915
-     *
      */
     @Test
     public void testThreeCharsLocale() {
@@ -544,11 +538,10 @@ public class LocaleUtilsTest extends AbstractLangTest {
             assertValidToLocale("us_EN_a", "us", "EN", "A");
             assertValidToLocale("us_EN_SFsafdFDsdfF", "us", "EN", "SFSAFDFDSDFF");
         }
-
-        assertThrows(
-                IllegalArgumentException.class, () -> LocaleUtils.toLocale("us_EN-a"), "Should fail as no consistent delimiter");
-        assertThrows(
-                IllegalArgumentException.class, () -> LocaleUtils.toLocale("uu_UU_"), "Must be 3, 5 or 7+ in length");
+        assertThrows(IllegalArgumentException.class, () -> LocaleUtils.toLocale("us_EN-a"), "Should fail as no consistent delimiter");
+        assertThrows(IllegalArgumentException.class, () -> LocaleUtils.toLocale("uu_UU_"), "Must be 3, 5 or 7+ in length");
+        // LANG-1741
+        assertEquals(new Locale("en", "001", "US_POSIX"), LocaleUtils.toLocale("en_001_US_POSIX"));
     }
 
     /**

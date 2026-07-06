@@ -76,6 +76,13 @@ public class AtomicInitializer<T> extends AbstractConcurrentInitializer<T, Concu
      */
     public static class Builder<I extends AtomicInitializer<T>, T> extends AbstractBuilder<I, T, Builder<I, T>, ConcurrentException> {
 
+        /**
+         * Constructs a new instance.
+         */
+        public Builder() {
+            // empty
+        }
+
         @SuppressWarnings("unchecked")
         @Override
         public I get() {
@@ -151,7 +158,7 @@ public class AtomicInitializer<T> extends AbstractConcurrentInitializer<T, Concu
      * {@inheritDoc}
      */
     @Override
-    protected ConcurrentException getTypedException(Exception e) {
+    protected ConcurrentException getTypedException(final Exception e) {
         return new ConcurrentException(e);
     }
 

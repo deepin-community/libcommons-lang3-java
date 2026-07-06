@@ -85,7 +85,6 @@ public class NumberUtils {
      */
     public static final Long LONG_INT_MIN_VALUE = Long.valueOf(Integer.MIN_VALUE);
 
-
     /**
      * Compares two {@code byte} values numerically. This is the same functionality as provided in Java 7.
      *
@@ -152,7 +151,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@link BigDecimal}.
+     * Creates a {@link BigDecimal} from a {@link String}.
      *
      * <p>Returns {@code null} if the string is {@code null}.</p>
      *
@@ -172,14 +171,16 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@link BigInteger};
-     * since 3.2 it handles hexadecimal (0x or #) and octal (0) notations.
+     * Creates a {@link BigInteger} from a {@link String}.
+     *
+     * Handles hexadecimal (0x or #) and octal (0) notations.
      *
      * <p>Returns {@code null} if the string is {@code null}.</p>
      *
      * @param str  a {@link String} to convert, may be null
      * @return converted {@link BigInteger} (or null if the input is null)
      * @throws NumberFormatException if the value cannot be converted
+     * @since 3.2
      */
     public static BigInteger createBigInteger(final String str) {
         if (str == null) {
@@ -214,7 +215,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@link Double}.
+     * Creates a {@link Double} from a {@link String}.
      *
      * <p>Returns {@code null} if the string is {@code null}.</p>
      *
@@ -230,7 +231,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@link Float}.
+     * Creates a {@link Float} from a {@link String}.
      *
      * <p>Returns {@code null} if the string is {@code null}.</p>
      *
@@ -246,8 +247,9 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@link Integer}, handling
-     * hexadecimal (0xhhhh) and octal (0dddd) notations.
+     * Creates an {@link Integer} from a {@link String}.
+     *
+     * Handles hexadecimal (0xhhhh) and octal (0dddd) notations.
      * N.B. a leading zero means octal; spaces are not trimmed.
      *
      * <p>Returns {@code null} if the string is {@code null}.</p>
@@ -265,8 +267,9 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@link Long};
-     * since 3.1 it handles hexadecimal (0Xhhhh) and octal (0ddd) notations.
+     * Creates a {@link Long} from a {@link String}.
+     *
+     * Handles hexadecimal (0Xhhhh) and octal (0ddd) notations.
      * N.B. a leading zero means octal; spaces are not trimmed.
      *
      * <p>Returns {@code null} if the string is {@code null}.</p>
@@ -274,6 +277,7 @@ public class NumberUtils {
      * @param str  a {@link String} to convert, may be null
      * @return converted {@link Long} (or null if the input is null)
      * @throws NumberFormatException if the value cannot be converted
+     * @since 3.1
      */
     public static Long createLong(final String str) {
         if (str == null) {
@@ -283,7 +287,7 @@ public class NumberUtils {
     }
 
     /**
-     * Turns a string value into a java.lang.Number.
+     * Creates a {@link Number} from a {@link String}.
      *
      * <p>If the string starts with {@code 0x} or {@code -0x} (lower or upper case) or {@code #} or {@code -#}, it
      * will be interpreted as a hexadecimal Integer - or Long, if the number of digits after the
@@ -362,7 +366,7 @@ public class NumberUtils {
         final boolean requestType = !Character.isDigit(lastChar) && lastChar != '.';
         if (decPos > -1) { // there is a decimal point
             if (expPos > -1) { // there is an exponent
-                if (expPos < decPos || expPos > length) { // prevents double exponent causing IOOBE
+                if (expPos <= decPos || expPos > length) { // prevents double exponent causing IOOBE
                     throw new NumberFormatException(str + " is not a valid number.");
                 }
                 dec = str.substring(decPos + 1, expPos);
@@ -486,19 +490,23 @@ public class NumberUtils {
     }
 
      /**
-     * Utility method for {@link #createNumber(java.lang.String)}.
+     * Utility method for {@link #createNumber(String)}.
      *
      * <p>Returns mantissa of the given number.</p>
      *
      * @param str the string representation of the number
      * @param stopPos the position of the exponent or decimal point
      * @return mantissa of the given number
+     * @throws NumberFormatException if no mantissa can be retrieved
      */
     private static String getMantissa(final String str, final int stopPos) {
-        final char firstChar = str.charAt(0);
-        final boolean hasSign = firstChar == '-' || firstChar == '+';
-
-        return hasSign ? str.substring(1, stopPos) : str.substring(0, stopPos);
+         final char firstChar = str.charAt(0);
+         final boolean hasSign = firstChar == '-' || firstChar == '+';
+         final int length = str.length();
+         if (length <= (hasSign ? 1 : 0) || length < stopPos) {
+             throw new NumberFormatException(str + " is not a valid number.");
+         }
+         return hasSign ? str.substring(1, stopPos) : str.substring(0, stopPos);
     }
 
     /**
@@ -776,7 +784,6 @@ public class NumberUtils {
     public static byte max(final byte... array) {
         // Validates input
         validateArray(array);
-
         // Finds and returns max
         byte max = array[0];
         for (int i = 1; i < array.length; i++) {
@@ -784,7 +791,6 @@ public class NumberUtils {
                 max = array[i];
             }
         }
-
         return max;
     }
 
@@ -819,7 +825,6 @@ public class NumberUtils {
     public static double max(final double... array) {
         // Validates input
         validateArray(array);
-
         // Finds and returns max
         double max = array[0];
         for (int j = 1; j < array.length; j++) {
@@ -830,7 +835,6 @@ public class NumberUtils {
                 max = array[j];
             }
         }
-
         return max;
     }
 
@@ -863,7 +867,6 @@ public class NumberUtils {
     public static float max(final float... array) {
         // Validates input
         validateArray(array);
-
         // Finds and returns max
         float max = array[0];
         for (int j = 1; j < array.length; j++) {
@@ -874,7 +877,6 @@ public class NumberUtils {
                 max = array[j];
             }
         }
-
         return max;
     }
 
@@ -941,7 +943,6 @@ public class NumberUtils {
     public static int max(final int... array) {
         // Validates input
         validateArray(array);
-
         // Finds and returns max
         int max = array[0];
         for (int j = 1; j < array.length; j++) {
@@ -949,7 +950,6 @@ public class NumberUtils {
                 max = array[j];
             }
         }
-
         return max;
     }
 
@@ -983,7 +983,6 @@ public class NumberUtils {
     public static long max(final long... array) {
         // Validates input
         validateArray(array);
-
         // Finds and returns max
         long max = array[0];
         for (int j = 1; j < array.length; j++) {
@@ -991,7 +990,6 @@ public class NumberUtils {
                 max = array[j];
             }
         }
-
         return max;
     }
 
@@ -1034,7 +1032,6 @@ public class NumberUtils {
                 max = array[i];
             }
         }
-
         return max;
     }
 
@@ -1068,7 +1065,6 @@ public class NumberUtils {
     public static byte min(final byte... array) {
         // Validates input
         validateArray(array);
-
         // Finds and returns min
         byte min = array[0];
         for (int i = 1; i < array.length; i++) {
@@ -1076,7 +1072,6 @@ public class NumberUtils {
                 min = array[i];
             }
         }
-
         return min;
     }
 
@@ -1122,7 +1117,6 @@ public class NumberUtils {
                 min = array[i];
             }
         }
-
         return min;
     }
 
@@ -1166,7 +1160,6 @@ public class NumberUtils {
                 min = array[i];
             }
         }
-
         return min;
     }
 
@@ -1198,7 +1191,6 @@ public class NumberUtils {
     public static int min(final int... array) {
         // Validates input
         validateArray(array);
-
         // Finds and returns min
         int min = array[0];
         for (int j = 1; j < array.length; j++) {
@@ -1206,7 +1198,6 @@ public class NumberUtils {
                 min = array[j];
             }
         }
-
         return min;
     }
 
@@ -1240,7 +1231,6 @@ public class NumberUtils {
     public static long min(final long... array) {
         // Validates input
         validateArray(array);
-
         // Finds and returns min
         long min = array[0];
         for (int i = 1; i < array.length; i++) {
@@ -1248,7 +1238,6 @@ public class NumberUtils {
                 min = array[i];
             }
         }
-
         return min;
     }
 
@@ -1283,7 +1272,6 @@ public class NumberUtils {
     public static short min(final short... array) {
         // Validates input
         validateArray(array);
-
         // Finds and returns min
         short min = array[0];
         for (int i = 1; i < array.length; i++) {
@@ -1314,7 +1302,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@code byte}, returning
+     * Converts a {@link String} to a {@code byte}, returning
      * {@code zero} if the conversion fails.
      *
      * <p>If the string is {@code null}, {@code zero} is returned.</p>
@@ -1335,7 +1323,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@code byte}, returning a
+     * Converts a {@link String} to a {@code byte}, returning a
      * default value if the conversion fails.
      *
      * <p>If the string is {@code null}, the default value is returned.</p>
@@ -1352,18 +1340,15 @@ public class NumberUtils {
      * @since 2.5
      */
     public static byte toByte(final String str, final byte defaultValue) {
-        if (str == null) {
-            return defaultValue;
-        }
         try {
             return Byte.parseByte(str);
-        } catch (final NumberFormatException nfe) {
+        } catch (final RuntimeException e) {
             return defaultValue;
         }
     }
 
     /**
-     * Convert a {@link BigDecimal} to a {@code double}.
+     * Converts a {@link BigDecimal} to a {@code double}.
      *
      * <p>If the {@link BigDecimal} {@code value} is
      * {@code null}, then the specified default value is returned.</p>
@@ -1383,7 +1368,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link BigDecimal} to a {@code double}.
+     * Converts a {@link BigDecimal} to a {@code double}.
      *
      * <p>If the {@link BigDecimal} {@code value} is
      * {@code null}, then the specified default value is returned.</p>
@@ -1404,7 +1389,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@code double}, returning
+     * Converts a {@link String} to a {@code double}, returning
      * {@code 0.0d} if the conversion fails.
      *
      * <p>If the string {@code str} is {@code null},
@@ -1426,7 +1411,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@code double}, returning a
+     * Converts a {@link String} to a {@code double}, returning a
      * default value if the conversion fails.
      *
      * <p>If the string {@code str} is {@code null}, the default
@@ -1445,18 +1430,15 @@ public class NumberUtils {
      * @since 2.1
      */
     public static double toDouble(final String str, final double defaultValue) {
-      if (str == null) {
-          return defaultValue;
-      }
       try {
           return Double.parseDouble(str);
-      } catch (final NumberFormatException nfe) {
+      } catch (final RuntimeException e) {
           return defaultValue;
       }
     }
 
     /**
-     * Convert a {@link String} to a {@code float}, returning
+     * Converts a {@link String} to a {@code float}, returning
      * {@code 0.0f} if the conversion fails.
      *
      * <p>If the string {@code str} is {@code null},
@@ -1478,14 +1460,14 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@code float}, returning a
+     * Converts a {@link String} to a {@code float}, returning a
      * default value if the conversion fails.
      *
      * <p>If the string {@code str} is {@code null}, the default
      * value is returned.</p>
      *
      * <pre>
-     *   NumberUtils.toFloat(null, 1.1f)   = 1.0f
+     *   NumberUtils.toFloat(null, 1.1f)   = 1.1f
      *   NumberUtils.toFloat("", 1.1f)     = 1.1f
      *   NumberUtils.toFloat("1.5", 0.0f)  = 1.5f
      * </pre>
@@ -1497,18 +1479,15 @@ public class NumberUtils {
      * @since 2.1
      */
     public static float toFloat(final String str, final float defaultValue) {
-      if (str == null) {
-          return defaultValue;
-      }
       try {
           return Float.parseFloat(str);
-      } catch (final NumberFormatException nfe) {
+      } catch (final RuntimeException e) {
           return defaultValue;
       }
     }
 
     /**
-     * Convert a {@link String} to an {@code int}, returning
+     * Converts a {@link String} to an {@code int}, returning
      * {@code zero} if the conversion fails.
      *
      * <p>If the string is {@code null}, {@code zero} is returned.</p>
@@ -1529,7 +1508,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to an {@code int}, returning a
+     * Converts a {@link String} to an {@code int}, returning a
      * default value if the conversion fails.
      *
      * <p>If the string is {@code null}, the default value is returned.</p>
@@ -1546,18 +1525,15 @@ public class NumberUtils {
      * @since 2.1
      */
     public static int toInt(final String str, final int defaultValue) {
-        if (str == null) {
-            return defaultValue;
-        }
         try {
             return Integer.parseInt(str);
-        } catch (final NumberFormatException nfe) {
+        } catch (final RuntimeException e) {
             return defaultValue;
         }
     }
 
     /**
-     * Convert a {@link String} to a {@code long}, returning
+     * Converts a {@link String} to a {@code long}, returning
      * {@code zero} if the conversion fails.
      *
      * <p>If the string is {@code null}, {@code zero} is returned.</p>
@@ -1578,7 +1554,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@code long}, returning a
+     * Converts a {@link String} to a {@code long}, returning a
      * default value if the conversion fails.
      *
      * <p>If the string is {@code null}, the default value is returned.</p>
@@ -1595,18 +1571,15 @@ public class NumberUtils {
      * @since 2.1
      */
     public static long toLong(final String str, final long defaultValue) {
-        if (str == null) {
-            return defaultValue;
-        }
         try {
             return Long.parseLong(str);
-        } catch (final NumberFormatException nfe) {
+        } catch (final RuntimeException e) {
             return defaultValue;
         }
     }
 
     /**
-     * Convert a {@link BigDecimal} to a {@link BigDecimal} with a scale of
+     * Converts a {@link BigDecimal} to a {@link BigDecimal} with a scale of
      * two that has been rounded using {@code RoundingMode.HALF_EVEN}. If the supplied
      * {@code value} is null, then {@code BigDecimal.ZERO} is returned.
      *
@@ -1622,7 +1595,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link BigDecimal} to a {@link BigDecimal} whose scale is the
+     * Converts a {@link BigDecimal} to a {@link BigDecimal} whose scale is the
      * specified value with a {@link RoundingMode} applied. If the input {@code value}
      * is {@code null}, we simply return {@code BigDecimal.ZERO}.
      *
@@ -1644,7 +1617,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link Double} to a {@link BigDecimal} with a scale of
+     * Converts a {@link Double} to a {@link BigDecimal} with a scale of
      * two that has been rounded using {@code RoundingMode.HALF_EVEN}. If the supplied
      * {@code value} is null, then {@code BigDecimal.ZERO} is returned.
      *
@@ -1660,7 +1633,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link Double} to a {@link BigDecimal} whose scale is the
+     * Converts a {@link Double} to a {@link BigDecimal} whose scale is the
      * specified value with a {@link RoundingMode} applied. If the input {@code value}
      * is {@code null}, we simply return {@code BigDecimal.ZERO}.
      *
@@ -1683,7 +1656,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link Float} to a {@link BigDecimal} with a scale of
+     * Converts a {@link Float} to a {@link BigDecimal} with a scale of
      * two that has been rounded using {@code RoundingMode.HALF_EVEN}. If the supplied
      * {@code value} is null, then {@code BigDecimal.ZERO} is returned.
      *
@@ -1699,7 +1672,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link Float} to a {@link BigDecimal} whose scale is the
+     * Converts a {@link Float} to a {@link BigDecimal} whose scale is the
      * specified value with a {@link RoundingMode} applied. If the input {@code value}
      * is {@code null}, we simply return {@code BigDecimal.ZERO}.
      *
@@ -1722,7 +1695,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@link BigDecimal} with a scale of
+     * Converts a {@link String} to a {@link BigDecimal} with a scale of
      * two that has been rounded using {@code RoundingMode.HALF_EVEN}. If the supplied
      * {@code value} is null, then {@code BigDecimal.ZERO} is returned.
      *
@@ -1738,7 +1711,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@link BigDecimal} whose scale is the
+     * Converts a {@link String} to a {@link BigDecimal} whose scale is the
      * specified value with a {@link RoundingMode} applied. If the input {@code value}
      * is {@code null}, we simply return {@code BigDecimal.ZERO}.
      *
@@ -1761,7 +1734,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to a {@code short}, returning
+     * Converts a {@link String} to a {@code short}, returning
      * {@code zero} if the conversion fails.
      *
      * <p>If the string is {@code null}, {@code zero} is returned.</p>
@@ -1782,7 +1755,7 @@ public class NumberUtils {
     }
 
     /**
-     * Convert a {@link String} to an {@code short}, returning a
+     * Converts a {@link String} to an {@code short}, returning a
      * default value if the conversion fails.
      *
      * <p>If the string is {@code null}, the default value is returned.</p>
@@ -1799,12 +1772,9 @@ public class NumberUtils {
      * @since 2.5
      */
     public static short toShort(final String str, final short defaultValue) {
-        if (str == null) {
-            return defaultValue;
-        }
         try {
             return Short.parseShort(str);
-        } catch (final NumberFormatException nfe) {
+        } catch (final RuntimeException e) {
             return defaultValue;
         }
     }
@@ -1824,14 +1794,15 @@ public class NumberUtils {
     private static boolean withDecimalsParsing(final String str, final int beginIdx) {
         int decimalPoints = 0;
         for (int i = beginIdx; i < str.length(); i++) {
-            final boolean isDecimalPoint = str.charAt(i) == '.';
+            final char ch = str.charAt(i);
+            final boolean isDecimalPoint = ch == '.';
             if (isDecimalPoint) {
                 decimalPoints++;
             }
             if (decimalPoints > 1) {
                 return false;
             }
-            if (!isDecimalPoint && !Character.isDigit(str.charAt(i))) {
+            if (!isDecimalPoint && !Character.isDigit(ch)) {
                 return false;
             }
         }
@@ -1844,7 +1815,11 @@ public class NumberUtils {
      *
      * <p>This constructor is public to permit tools that require a JavaBean instance
      * to operate.</p>
+     *
+     * @deprecated TODO Make private in 4.0.
      */
+    @Deprecated
     public NumberUtils() {
+        // empty
     }
 }

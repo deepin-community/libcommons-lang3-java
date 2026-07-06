@@ -51,7 +51,7 @@ final class ClassNotFoundSerialization implements Serializable {
 }
 
 /**
- * Unit tests {@link org.apache.commons.lang3.SerializationUtils}.
+ * Unit tests {@link SerializationUtils}.
  */
 public class SerializationUtilsTest extends AbstractLangTest {
 
@@ -70,7 +70,6 @@ public class SerializationUtilsTest extends AbstractLangTest {
         iMap.put("FOO", iString);
         iMap.put("BAR", iInteger);
     }
-
 
     @Test
     public void testClone() {
@@ -91,7 +90,6 @@ public class SerializationUtilsTest extends AbstractLangTest {
         final Object test = SerializationUtils.clone(null);
         assertNull(test);
     }
-
 
     @Test
     public void testCloneUnserializable() {
@@ -150,7 +148,6 @@ public class SerializationUtilsTest extends AbstractLangTest {
         final Object test = SerializationUtils.deserialize(streamReal.toByteArray());
         assertNull(test);
     }
-
 
     @Test
     public void testDeserializeClassCastException() {
@@ -245,6 +242,16 @@ public class SerializationUtilsTest extends AbstractLangTest {
     }
 
     @Test
+    public void testNegativeByteArray() {
+        final byte[] byteArray = {
+            (byte) -84, (byte) -19, (byte) 0, (byte) 5, (byte) 125, (byte) -19, (byte) 0,
+            (byte) 5, (byte) 115, (byte) 114, (byte) -1, (byte) 97, (byte) 122, (byte) -48, (byte) -65
+        };
+
+        assertThrows(SerializationException.class, () -> SerializationUtils.deserialize(new ByteArrayInputStream(byteArray)));
+    }
+
+    @Test
     public void testPrimitiveTypeClassSerialization() {
         final Class<?>[] primitiveTypes = { byte.class, short.class, int.class, long.class, float.class, double.class,
                 boolean.class, char.class, void.class };
@@ -275,7 +282,6 @@ public class SerializationUtilsTest extends AbstractLangTest {
         assertEquals(testBytes.length, realBytes.length);
         assertArrayEquals(realBytes, testBytes);
     }
-
 
     @Test
     public void testSerializeBytesNull() throws Exception {
@@ -330,7 +336,6 @@ public class SerializationUtilsTest extends AbstractLangTest {
         assertArrayEquals(realBytes, testBytes);
     }
 
-
     @Test
     public void testSerializeStreamNullNull() {
         assertThrows(NullPointerException.class, () -> SerializationUtils.serialize(null, null));
@@ -364,5 +369,4 @@ public class SerializationUtilsTest extends AbstractLangTest {
         iMap.put(new Object(), new Object());
         assertThrows(SerializationException.class, () -> SerializationUtils.serialize(iMap, streamTest));
     }
-
 }

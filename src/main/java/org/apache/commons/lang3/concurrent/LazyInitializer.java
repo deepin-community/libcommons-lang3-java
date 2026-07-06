@@ -37,12 +37,13 @@ import org.apache.commons.lang3.function.FailableSupplier;
  * this class, a subclass of {@link LazyInitializer} has to be created:
  * </p>
  *
- * <pre>
- * public class ComplexObjectInitializer extends LazyInitializer&lt;ComplexObject&gt; {
+ * <pre>{@code
+ * public class ComplexObjectInitializer extends LazyInitializer<ComplexObject> {
  *     &#064;Override
  *     protected ComplexObject initialize() {
  *         return new ComplexObject();
  *     }
+ * }
  * }
  * </pre>
  *
@@ -79,6 +80,13 @@ public class LazyInitializer<T> extends AbstractConcurrentInitializer<T, Concurr
      */
     public static class Builder<I extends LazyInitializer<T>, T> extends AbstractBuilder<I, T, Builder<I, T>, ConcurrentException> {
 
+        /**
+         * Constructs a new instance.
+         */
+        public Builder() {
+            // empty
+        }
+
         @SuppressWarnings("unchecked")
         @Override
         public I get() {
@@ -88,7 +96,7 @@ public class LazyInitializer<T> extends AbstractConcurrentInitializer<T, Concurr
     }
 
     /**
-     * A unique value indicating an un-initialzed instance.
+     * A unique value indicating an un-initialized instance.
      */
     private static final Object NO_INIT = new Object();
 
@@ -152,7 +160,7 @@ public class LazyInitializer<T> extends AbstractConcurrentInitializer<T, Concurr
      * {@inheritDoc}
      */
     @Override
-    protected ConcurrentException getTypedException(Exception e) {
+    protected ConcurrentException getTypedException(final Exception e) {
         return new ConcurrentException(e);
     }
 

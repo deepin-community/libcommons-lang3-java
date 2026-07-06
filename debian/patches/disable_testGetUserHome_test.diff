@@ -5,7 +5,7 @@ Last-Update: 2012-05-27
 Forwarded: not-needed
 --- a/src/test/java/org/apache/commons/lang3/SystemUtilsTest.java
 +++ b/src/test/java/org/apache/commons/lang3/SystemUtilsTest.java
-@@ -259,6 +259,7 @@
+@@ -285,6 +285,7 @@
       * Assumes no security manager exists.
       */
      @Test
